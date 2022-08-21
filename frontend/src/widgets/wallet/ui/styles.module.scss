@@ -1,0 +1,127 @@
+.walletConnected {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 15px;
+  border-radius: 15px;
+  background-color: $primary;
+  color: black;
+
+  button {
+    margin-left: 15px;
+  }
+}
+
+.wallet {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 15px;
+  border-radius: 15px;
+  background-color: $primary;
+  color: black;
+  cursor: pointer;
+}
+
+.body {
+  display: flex;
+  flex-direction: row;
+  height: 400px;
+  width: 100%;
+
+  &Progress {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    background-color: $secondary;
+    padding: 0 10px;
+
+    &Title {
+      height: 45px;
+      display: flex;
+      align-items: center;
+    }
+
+    &Text {
+      font-size: 14px;
+      font-weight: 300;
+    }
+
+    &Bar {
+      margin-top: 30px;
+      width: 100%;
+      display: flex;
+    }
+  }
+
+  &Wallets {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 400px;
+
+    &Header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 45px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.048);
+      padding: 0 10px;
+
+      &Close {
+        cursor: pointer;
+      }
+    }
+
+    &List {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      padding-top: 0;
+      padding: 10px;
+      gap: 10px;
+
+      &Item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid $secondary;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $primary;
+          color: #000;
+        }
+
+        span {
+          margin-left: 7px;
+        }
+      }
+    }
+  }
+}
+
+.stateBody {
+  padding: 10px;
+
+  &Block {
+    font-size: 14px;
+    background-color: $bgColor;
+    border: 1px solid $secondary;
+    padding: 10px;
+    border-radius: 5px;
+
+    button {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+    }
+
+    &.warning {
+      background-color: #ffefcc;
+      border: 1px solid $primary;
+      padding: 0;
+    }
+  }
+}

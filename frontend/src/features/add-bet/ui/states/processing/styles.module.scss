@@ -1,0 +1,29 @@
+.modalBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+
+  h4 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  &Block {
+    display: flex;
+    flex-direction: column;
+    background-color: $secondary;
+    padding: 1rem;
+    border-radius: 1rem;
+
+    h5 {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    span {
+      font-size: 14px;
+    }
+  }
+}

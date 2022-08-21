@@ -1,0 +1,51 @@
+.list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 20px;
+
+  &Item {
+    display: flex;
+    border-radius: 1rem;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+
+    &:hover {
+      background-color: $primary;
+      a {
+        color: #000;
+      }
+    }
+
+    a {
+      padding: 0.5rem 0.7rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: #f5f5f5;
+      width: 100%;
+    }
+
+    span {
+      margin-left: 5px;
+    }
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.active {
+  background-color: $primary;
+  a {
+    color: #000;
+  }
+}

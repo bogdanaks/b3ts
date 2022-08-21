@@ -1,0 +1,26 @@
+.tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 15px;
+
+  li {
+    border-radius: 1rem;
+  }
+}
+
+.tab {
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #000;
+}
+
+.body {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.activeTab {
+  background-color: $primary;
+}
