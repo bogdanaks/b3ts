@@ -16,6 +16,12 @@
           color: $primary;
         }
       }
+
+      &.active {
+        a {
+          color: $primary;
+        }
+      }
     }
   }
 }
