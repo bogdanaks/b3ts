@@ -48,15 +48,15 @@ describe("Bets", function () {
       const { bets } = await loadFixture(deploy)
       await createMatch(4)
       const matches = await bets.getMatches([4, 5])
-      console.log("matches", matches)
+      // console.log("matches", matches)
     })
 
     it("Get my matches", async function () {
       const { bets } = await loadFixture(deploy)
       await createMatch()
       await bets.addBet(1, "TEAM_1")
-      const myMatches = await bets.getMyMatches()
-      // console.log("myMatches", myMatches)
+      const myMatches = await bets.getMyMatches(10, 0)
+      console.log("myMatches", myMatches)
     })
   })
 
