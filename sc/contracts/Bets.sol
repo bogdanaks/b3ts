@@ -3,13 +3,11 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 // Import this file to use console.log
 import "hardhat/console.sol";
 
 contract Bets is Ownable {
     using SafeMath for uint256;
-    using EnumerableMap for EnumerableMap.UintToAddressMap;
 
     enum MatchStatus {
         CREATED,
@@ -53,8 +51,6 @@ contract Bets is Ownable {
     mapping(uint256 => Match) public matches;
     mapping(address => uint256[]) public matchesIds;
     bool public isPaused = false;
-
-    EnumerableMap.AddressToUintMap private myMap; // TEST
 
     constructor(uint256 _feePercent, address _piggyBank) {
         feePercent = _feePercent;
