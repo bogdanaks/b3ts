@@ -43,3 +43,10 @@ type Match = {
 interface MatchWithSmart extends Match {
   matchFromSmart: MatchStruct | null
 }
+
+interface ResponseData<T> {
+  data: T
+  limit: number
+  page: number
+  total: number
+}
