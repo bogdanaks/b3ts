@@ -3,11 +3,14 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 // Import this file to use console.log
 import "hardhat/console.sol";
 
 contract Bets is Ownable {
     using SafeMath for uint256;
+    using EnumerableMap for EnumerableMap.UintToAddressMap;
+
     enum MatchStatus {
         CREATED,
         RUNNING,
@@ -51,6 +54,8 @@ contract Bets is Ownable {
     mapping(address => uint256[]) public matchesIds;
     bool public isPaused = false;
 
+    EnumerableMap.AddressToUintMap private myMap; // TEST
+
     constructor(uint256 _feePercent, address _piggyBank) {
         feePercent = _feePercent;
         piggyBank = _piggyBank;
@@ -93,13 +98,21 @@ contract Bets is Ownable {
         return _matchesList;
     }
 
-    function getMyMatches() public view returns (Match[] memory findMatches) {
-        // add limit, offset
-        Match[] memory _matchesList = new Match[](
-            matchesIds[msg.sender].length
-        );
-        for (uint256 i = 0; i < matchesIds[msg.sender].length; i++) {
-            Match memory _findMatch = matches[matchesIds[msg.sender][i]];
+    function getMyMatches(uint8 limit, uint64 offset)
+        public
+        view
+        returns (Match[] memory findMatches)
+    {
+        require(matchesIds[msg.sender].length > 0, "Not found");
+        uint256 matchesCount = matchesIds[msg.sender].length >= limit
+            ? limit
+            : matchesIds[msg.sender].length;
+        Match[] memory _matchesList = new Match[](matchesCount);
+        for (uint8 i = 0; i < limit; i++) {
+            if (matchesIds[msg.sender].length == i) break;
+            Match memory _findMatch = matches[
+                matchesIds[msg.sender][i + offset]
+            ];
             _matchesList[i] = _findMatch;
         }
         return _matchesList;
