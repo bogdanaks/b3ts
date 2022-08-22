@@ -289,7 +289,18 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "limit",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint64",
+        "name": "offset",
+        "type": "uint64"
+      }
+    ],
     "name": "getMyMatches",
     "outputs": [
       {
