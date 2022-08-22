@@ -10,16 +10,34 @@ export class MatchService {
     private matchRepository: Repository<Match>
   ) {}
 
-  findAll({
+  count({
     status,
     sport
   }: {
     status: MatchStatus
     sport?: string
+  }): Promise<number> {
+    return this.matchRepository.count({
+      where: { status, sport: { slug: sport } }
+    })
+  }
+
+  findAll({
+    status,
+    sport,
+    limit,
+    page
+  }: {
+    status: MatchStatus
+    sport?: string
+    limit?: number
+    page?: number
   }): Promise<Match[]> {
     return this.matchRepository.find({
       where: { status, sport: { slug: sport } },
-      relations: ["sport"]
+      relations: ["sport"],
+      take: limit,
+      skip: limit * page - limit
     })
   }
 }
