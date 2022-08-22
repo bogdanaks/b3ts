@@ -1,8 +1,11 @@
 import Big from "big.js"
 import React, { useState } from "react"
+import { useClient } from "wagmi"
 
 export const useBets = () => {
   const [total, setTotal] = useState(new Big(0))
+  const client = useClient()
+
   const formattingBets = (bets: BetStruct[]) => {
     const res: { [market: string]: BetStruct[] } = {}
     const resWithWotal: {
