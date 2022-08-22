@@ -15,7 +15,7 @@ const SpotPage = () => {
     <Layout>
       <Header />
       <Wrapper>
-        <SportsBar />
+        <SportsBar rootRoute="sports" />
         <Tabs style={{ marginTop: 20 }}>
           <Tabs.Tab title="Matches" body={<Matches sport={String(sport)} />} />
           <></>

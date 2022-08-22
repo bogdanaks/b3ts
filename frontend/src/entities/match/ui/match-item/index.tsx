@@ -6,6 +6,7 @@ import { IoArrowDown } from "react-icons/io5"
 import classNames from "classnames"
 import { BetsList } from "entities/bet/ui/bets-list"
 import { AddBet } from "features/add-bet/ui"
+import { Card } from "shared/ui/card"
 
 interface MatchItemProps {
   match: MatchWithSmart
@@ -25,7 +26,7 @@ export const MatchItem = ({ match }: MatchItemProps) => {
   }
 
   return (
-    <li className={styles.item}>
+    <Card className={styles.item} as="li">
       <div className={styles.itemWrapper}>
         <div className={styles.itemContent}>
           <div className={styles.itemInfo}>
@@ -59,12 +60,14 @@ export const MatchItem = ({ match }: MatchItemProps) => {
         </div>
         <div
           onClick={handleArrowClick}
-          className={classNames(styles.itemArrow, { [styles.isOpen]: isOpen })}
+          className={classNames(styles.itemArrow, {
+            [styles.isOpen]: isOpen,
+          })}
         >
           <IoArrowDown fontSize={20} />
         </div>
       </div>
       {isOpenBets && <BetsList match={match} />}
-    </li>
+    </Card>
   )
 }

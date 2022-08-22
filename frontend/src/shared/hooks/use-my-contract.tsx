@@ -50,6 +50,29 @@ export const useMyContract = () => {
     return matchesFormatting
   }
 
+  const getMyMatches = async ({
+    limit = 10,
+    offset = 0,
+  }: {
+    limit: number
+    offset: number
+  }): Promise<MatchStruct[]> => {
+    if (!contract) return []
+    const matches: any[] = await contract.getMyMatches(limit, offset)
+    const clearMatches = matches.filter((item) => item.createdAt > 0)
+    const matchesFormatting = clearMatches.map((item) => {
+      return {
+        id: Big(item.id).toNumber(),
+        status: item.status,
+        wonMarkets: item.wonMarkets,
+        markets: item.markets,
+        bets: item.bets,
+        createdAt: Big(item.createdAt).toNumber(),
+      }
+    })
+    return matchesFormatting
+  }
+
   const getMatchesLength = async (): Promise<number | undefined> => {
     if (!contract) return
     const matchesLength = await contract.matchesLength()
@@ -124,6 +147,7 @@ export const useMyContract = () => {
     contract,
     status,
     getMatchesByIds,
+    getMyMatches,
     getMatchesLength,
     createMatch,
     addBet,
