@@ -1,8 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config"
 import "@nomicfoundation/hardhat-toolbox"
 
-// import "./tasks/seeding-matches"
-// import "./tasks/seeding-bets"
+import "./tasks/seeding"
 
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
