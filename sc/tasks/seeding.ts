@@ -4,15 +4,19 @@ import "@nomiclabs/hardhat-ethers"
 
 interface IArgs {
   contract: string
+  sizem: number
+  sizeb: number
 }
 
 task("seeding", "Seeding data")
   .addParam("contract", "Contract address")
+  .addParam("sizem", "Seed size matches")
+  .addParam("sizeb", "Seed size bets")
   .setAction(async (args: IArgs, hre) => {
     console.log("Start seeding data: ", new Date())
     const Bets = await hre.ethers.getContractAt("Bets", args.contract)
-    const matchesIds = [...Array(100).keys()]
-    const betsIds = [...Array(100).keys()]
+    const matchesIds = [...Array(args.sizem).keys()]
+    const betsIds = [...Array(args.sizeb).keys()]
     const markets = ["TEAM_1", "TEAM_2"]
 
     for (const matchId of matchesIds) {
