@@ -16,7 +16,7 @@ export const Header = () => {
       <ul className={styles.headerList}>
         <li
           className={classNames(styles.headerListItem, {
-            [styles.active]: router.asPath === "/my-bets",
+            [styles.active]: router.asPath.includes("/my-bets"),
           })}
         >
           <Link href="/my-bets">

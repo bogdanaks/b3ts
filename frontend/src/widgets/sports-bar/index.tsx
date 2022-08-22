@@ -6,17 +6,23 @@ import cn from "classnames"
 
 import styles from "./styles.module.scss"
 
-export const SportsBar = () => {
+interface SportsBarProps {
+  rootRoute: string
+  activeLink?: number
+}
+
+export const SportsBar = ({ rootRoute, activeLink }: SportsBarProps) => {
   const router = useRouter()
 
   return (
     <ul className={styles.list}>
       <li
         className={cn(styles.listItem, {
-          [styles.active]: router.asPath === "/sports/football",
+          [styles.active]:
+            router.asPath === `/${rootRoute}/football` || activeLink === 1,
         })}
       >
-        <Link href="/sports/football">
+        <Link href={`/${rootRoute}/football`}>
           <a>
             <Image
               src="/assets/sports/football.webp"
@@ -30,10 +36,11 @@ export const SportsBar = () => {
       </li>
       <li
         className={cn(styles.listItem, {
-          [styles.active]: router.asPath === "/sports/csgo",
+          [styles.active]:
+            router.asPath === `/${rootRoute}/csgo` || activeLink === 2,
         })}
       >
-        <Link href="/sports/csgo">
+        <Link href={`/${rootRoute}/csgo`}>
           <a>
             <Image
               src="/assets/sports/csgo.webp"
@@ -47,10 +54,11 @@ export const SportsBar = () => {
       </li>
       <li
         className={cn(styles.listItem, {
-          [styles.active]: router.asPath === "/sports/dota2",
+          [styles.active]:
+            router.asPath === `/${rootRoute}/dota2` || activeLink === 3,
         })}
       >
-        <Link href="/sports/dota2">
+        <Link href={`/${rootRoute}/dota2`}>
           <a>
             <Image
               src="/assets/sports/dota.webp"
