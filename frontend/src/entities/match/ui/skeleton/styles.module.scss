@@ -1,0 +1,25 @@
+$base-color: $secondary;
+$shine-color: #191b33;
+$animation-duration: 1.6s;
+
+.item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 2rem;
+  height: 76px;
+
+  background-image: linear-gradient(90deg, $base-color 0, $shine-color 40px, $base-color 80px);
+  background-size: 800px;
+  animation: shine-lines $animation-duration infinite linear;
+  margin-bottom: 10px;
+}
+
+@keyframes shine-lines {
+  0% {
+    background-position: -400px;
+  }
+  100% {
+    background-position: 400px;
+  }
+}
