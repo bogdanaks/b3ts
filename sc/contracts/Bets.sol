@@ -79,6 +79,7 @@ contract Bets is Ownable {
         uint256 startAt
     ) public onlyIfRunning onlyOwner {
         Match storage newMatch = matches[id];
+        require(newMatch.id == 0, "Already created"); // TODO проверить
         newMatch.id = id;
         newMatch.status = MatchStatus.CREATED;
         newMatch.markets = marketsList;
@@ -94,7 +95,9 @@ contract Bets is Ownable {
     {
         Match[] memory _matchesList = new Match[](ids.length);
         for (uint256 i = 0; i < ids.length; i++) {
+            console.log("ids id", ids[i]);
             Match memory _findMatch = matches[ids[i]];
+            console.log("_findMatch id", _findMatch.id);
             _matchesList[i] = _findMatch;
         }
         return _matchesList;

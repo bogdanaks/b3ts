@@ -14,7 +14,7 @@ describe("Bets", function () {
 
   async function createMatch(id = 1) {
     const { bets } = await loadFixture(deploy)
-    await bets.createMatch(
+    const tx = await bets.createMatch(
       id,
       [
         ["TEAM_1", "TEAM_2"],
@@ -22,6 +22,7 @@ describe("Bets", function () {
       ],
       Date.now()
     )
+    await tx.wait()
   }
 
   describe("Deployment", function () {
@@ -54,9 +55,11 @@ describe("Bets", function () {
       await createMatch(5)
       const matches = await bets.getMatches([4, 5])
       console.log("matches", matches)
+      // TODO не работает, возвращает пустой и нормальный элеиенты
 
-      expect(matches.length).to.equal(1)
+      expect(matches.length).to.equal(2)
       expect(matches[0].id.toNumber()).to.equal(4)
+      expect(matches[1].id.toNumber()).to.equal(5)
     })
 
     it("Get my matches", async function () {
