@@ -29,8 +29,7 @@ contract Bets is Ownable {
         MatchStatus status;
         string[] wonMarkets;
         string[][] markets;
-        Bet[] bets;
-        uint256 createdAt;
+        uint256 startAt;
     }
 
     event AddBet(
@@ -40,17 +39,24 @@ contract Bets is Ownable {
         string market,
         address user
     );
-    event CreateMatch(uint256 id, string[][] marketsList);
-    event UpdateMatch(uint256 id, MatchStatus status, string[] wonMarkets);
+    event CreateMatch(uint256 id, string[][] marketsList, uint256 startAt);
+    event UpdateMatch(
+        uint256 id,
+        MatchStatus status,
+        string[] wonMarkets,
+        uint256 startAt
+    );
 
     uint32 constant MULTFACTOR = 1000000;
+    bool public isPaused = false;
+
     uint256 internal betId = 1;
     uint256 public matchesLength = 0;
     uint256 private feePercent;
     address internal piggyBank;
     mapping(uint256 => Match) public matches;
-    mapping(address => uint256[]) public matchesIds;
-    bool public isPaused = false;
+    mapping(uint256 => Bet[]) public bets;
+    mapping(address => uint256[]) public userMatches;
 
     constructor(uint256 _feePercent, address _piggyBank) {
         feePercent = _feePercent;
@@ -67,18 +73,18 @@ contract Bets is Ownable {
     }
 
     // Match
-    function createMatch(uint256 id, string[][] memory marketsList)
-        public
-        onlyIfRunning
-        onlyOwner
-    {
+    function createMatch(
+        uint256 id,
+        string[][] memory marketsList,
+        uint256 startAt
+    ) public onlyIfRunning onlyOwner {
         Match storage newMatch = matches[id];
         newMatch.id = id;
         newMatch.status = MatchStatus.CREATED;
         newMatch.markets = marketsList;
-        newMatch.createdAt = block.timestamp;
+        newMatch.startAt = startAt;
         matchesLength++;
-        emit CreateMatch(id, marketsList);
+        emit CreateMatch(id, marketsList, startAt);
     }
 
     function getMatches(uint256[] memory ids)
@@ -99,15 +105,15 @@ contract Bets is Ownable {
         view
         returns (Match[] memory findMatches)
     {
-        require(matchesIds[msg.sender].length > 0, "Not found");
-        uint256 matchesCount = matchesIds[msg.sender].length >= limit
+        require(userMatches[msg.sender].length > 0, "Not found");
+        uint256 matchesCount = userMatches[msg.sender].length >= limit
             ? limit
-            : matchesIds[msg.sender].length;
+            : userMatches[msg.sender].length;
         Match[] memory _matchesList = new Match[](matchesCount);
         for (uint8 i = 0; i < limit; i++) {
-            if (matchesIds[msg.sender].length == i) break;
+            if (userMatches[msg.sender].length == i) break;
             Match memory _findMatch = matches[
-                matchesIds[msg.sender][i + offset]
+                userMatches[msg.sender][i + offset]
             ];
             _matchesList[i] = _findMatch;
         }
@@ -117,11 +123,13 @@ contract Bets is Ownable {
     function updateMatch(
         uint256 id,
         MatchStatus status,
-        string[] memory wonMarkets
+        string[] memory wonMarkets,
+        uint256 startAt
     ) public onlyIfRunning onlyOwner {
         matches[id].status = status;
         matches[id].wonMarkets = wonMarkets;
-        emit UpdateMatch(id, status, wonMarkets);
+        matches[id].startAt = startAt;
+        emit UpdateMatch(id, status, wonMarkets, startAt);
     }
 
     // Bets
@@ -137,8 +145,9 @@ contract Bets is Ownable {
             msg.value,
             block.timestamp
         );
-        matches[matchId].bets.push(newBet);
-        matchesIds[msg.sender].push(matchId);
+        bets[matchId].push(newBet);
+        userMatches[msg.sender].push(matchId);
+
         emit AddBet(betId, matchId, msg.value, market, msg.sender);
         betId++;
     }
@@ -148,10 +157,11 @@ contract Bets is Ownable {
         view
         returns (Bet[] memory findBets)
     {
-        return matches[matchId].bets;
+        return bets[matchId];
     }
 
     // Withdraw
+    // TODO фикс с новым типом ставок
     function withdrawByMatchId(uint256 matchId) public onlyIfRunning {
         Match memory findMatch = matches[matchId];
         require(
@@ -204,6 +214,7 @@ contract Bets is Ownable {
         return wonAmount.add(myTotalAmount);
     }
 
+    // TODO проверить, как цикл проходит по 10к ставок в матче
     function getMatchAmount(
         string[] memory wonMarkets,
         Bet[] memory findAllBets
