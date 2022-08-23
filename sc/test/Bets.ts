@@ -14,10 +14,14 @@ describe("Bets", function () {
 
   async function createMatch(id = 1) {
     const { bets } = await loadFixture(deploy)
-    await bets.createMatch(id, [
-      ["TEAM_1", "TEAM_2"],
-      ["TOTAL_LS_10", "TOTAL_GR_10"],
-    ])
+    await bets.createMatch(
+      id,
+      [
+        ["TEAM_1", "TEAM_2"],
+        ["TOTAL_LS_10", "TOTAL_GR_10"],
+      ],
+      Date.now()
+    )
   }
 
   describe("Deployment", function () {
@@ -39,7 +43,7 @@ describe("Bets", function () {
       const { bets } = await loadFixture(deploy)
       await createMatch()
       expect(await bets.matchesLength()).to.equal(1)
-      await bets.updateMatch(1, 2, ["TEAM_1"])
+      await bets.updateMatch(1, 2, ["TEAM_1"], Date.now())
       const match = await bets.getMatches([1])
       // console.log("updated match", match)
     })
@@ -47,8 +51,12 @@ describe("Bets", function () {
     it("Get matches", async function () {
       const { bets } = await loadFixture(deploy)
       await createMatch(4)
+      await createMatch(5)
       const matches = await bets.getMatches([4, 5])
-      // console.log("matches", matches)
+      console.log("matches", matches)
+
+      expect(matches.length).to.equal(1)
+      expect(matches[0].id.toNumber()).to.equal(4)
     })
 
     it("Get my matches", async function () {
@@ -56,7 +64,8 @@ describe("Bets", function () {
       await createMatch()
       await bets.addBet(1, "TEAM_1")
       const myMatches = await bets.getMyMatches(10, 0)
-      console.log("myMatches", myMatches)
+      expect(myMatches.length).to.equal(1)
+      expect(myMatches[0].id.toNumber()).to.equal(1)
     })
   })
 
@@ -104,7 +113,7 @@ describe("Bets", function () {
         value: ethers.utils.parseEther("10"),
       })
 
-      await bets.updateMatch(1, 2, ["TEAM_1"])
+      await bets.updateMatch(1, 2, ["TEAM_1"], Date.now())
       const balancePiggyBankBefore = await otherAccount2.getBalance()
       await bets.withdrawByMatchId(1)
       const balancePiggyBankAfter = await otherAccount2.getBalance()

@@ -20,7 +20,11 @@ task("seeding", "Seeding data")
     const markets = ["TEAM_1", "TEAM_2"]
 
     for (const matchId of matchesIds) {
-      const txMatch = await Bets.createMatch(matchId, [["TEAM_1", "TEAM_2"]])
+      const txMatch = await Bets.createMatch(
+        matchId,
+        [["TEAM_1", "TEAM_2"]],
+        Date.now()
+      )
       await txMatch.wait()
       for (const betId of betsIds) {
         const txBet = await Bets.addBet(

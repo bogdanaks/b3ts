@@ -15,7 +15,11 @@ task("create-match", "Create match")
   .setAction(async (args: IArgs, hre) => {
     const Bets = await hre.ethers.getContractAt("Bets", args.contract)
 
-    const tx = await Bets.createMatch(args.matchid, args.marketslist)
+    const tx = await Bets.createMatch(
+      args.matchid,
+      args.marketslist,
+      Date.now()
+    )
     await tx.wait()
 
     console.log(`Successfully create match by id - ${args.matchid}`)
