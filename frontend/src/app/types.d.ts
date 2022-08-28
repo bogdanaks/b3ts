@@ -1,22 +1,5 @@
 type ContractEvents = "AddBet" | "CreateMatch" | "UpdateMatch"
 
-type BetStruct = {
-  id: Big
-  user: string
-  market: string
-  amount: Big
-  createdAt: Big
-}
-
-type MatchStruct = {
-  id: PromiseOrValue<number>
-  status: PromiseOrValue<BigNumberish>
-  wonMarkets: PromiseOrValue<string>[]
-  markets: PromiseOrValue<string>[][]
-  bets: BetStruct[]
-  createdAt: PromiseOrValue<BigNumberish>
-}
-
 type MatchStatus = "CREATED" | "RUNNING" | "FINISHED" | "CANCELED"
 
 type Match = {
