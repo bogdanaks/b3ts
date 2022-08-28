@@ -66,6 +66,12 @@
         "internalType": "string[][]",
         "name": "marketsList",
         "type": "string[][]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startAt",
+        "type": "uint256"
       }
     ],
     "name": "CreateMatch",
@@ -110,6 +116,12 @@
         "internalType": "string[]",
         "name": "wonMarkets",
         "type": "string[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startAt",
+        "type": "uint256"
       }
     ],
     "name": "UpdateMatch",
@@ -119,18 +131,62 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "matchId",
+        "name": "_matchId",
         "type": "uint256"
       },
       {
         "internalType": "string",
-        "name": "market",
+        "name": "_market",
         "type": "string"
       }
     ],
     "name": "addBet",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "bets",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "market",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "createdAt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -149,14 +205,14 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
         "internalType": "string[][]",
         "name": "marketsList",
         "type": "string[][]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startAt",
+        "type": "uint256"
       }
     ],
     "name": "createMatch",
@@ -168,7 +224,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "matchId",
+        "name": "_matchId",
         "type": "uint256"
       }
     ],
@@ -218,7 +274,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "getMatches",
+    "name": "getMatchesByIds",
     "outputs": [
       {
         "components": [
@@ -243,40 +299,8 @@
             "type": "string[][]"
           },
           {
-            "components": [
-              {
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-              },
-              {
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-              },
-              {
-                "internalType": "string",
-                "name": "market",
-                "type": "string"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "createdAt",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct Bets.Bet[]",
-            "name": "bets",
-            "type": "tuple[]"
-          },
-          {
             "internalType": "uint256",
-            "name": "createdAt",
+            "name": "startAt",
             "type": "uint256"
           }
         ],
@@ -326,40 +350,8 @@
             "type": "string[][]"
           },
           {
-            "components": [
-              {
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-              },
-              {
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-              },
-              {
-                "internalType": "string",
-                "name": "market",
-                "type": "string"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "createdAt",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct Bets.Bet[]",
-            "name": "bets",
-            "type": "tuple[]"
-          },
-          {
             "internalType": "uint256",
-            "name": "createdAt",
+            "name": "startAt",
             "type": "uint256"
           }
         ],
@@ -379,6 +371,19 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "matchId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -406,44 +411,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "createdAt",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "matchesIds",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "matchesLength",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
+        "name": "startAt",
         "type": "uint256"
       }
     ],
@@ -499,6 +467,11 @@
         "internalType": "string[]",
         "name": "wonMarkets",
         "type": "string[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startAt",
+        "type": "uint256"
       }
     ],
     "name": "updateMatch",
@@ -509,8 +482,32 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "matchId",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "userMatches",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_matchId",
         "type": "uint256"
       }
     ],

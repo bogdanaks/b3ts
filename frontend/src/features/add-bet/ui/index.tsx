@@ -1,5 +1,5 @@
-import Big from "big.js"
-import React, { useMemo } from "react"
+import { BetInfo } from "entities/bet/ui/bet-info"
+import React, { useState } from "react"
 
 import { Modal } from "shared/ui/modal"
 import { useAccount, useBalance } from "wagmi"
@@ -17,85 +17,66 @@ export const AddBet = ({
   market,
   isOpen,
 }: {
-  match: MatchWithSmart
+  match: Match
   market: string
   isOpen: boolean
 }) => {
+  const [isLoadBets, setIsLoadBets] = useState(false)
   const {
     onAddBet,
     onAmountChange,
     onMarketClick,
     setToggle,
     setBidState,
-    totalBetsByMarket,
+    potentialWon,
     selectedMarket,
     toggle,
     amount,
     bidState,
-  } = useAddBet(match)
+    totalByMarket,
+  } = useAddBet(match, isLoadBets || isOpen)
   const account = useAccount()
   const { data } = useBalance({
     addressOrName: account.address,
   })
-  const calculatePotential = useMemo(() => {
-    let potentialWon = new Big(0)
-    if (!selectedMarket) return potentialWon
-    if (!amount) return potentialWon
-    if (amount === "0") return potentialWon
-    if (!Object.keys(totalBetsByMarket).length) return potentialWon.plus(amount)
 
-    let myTotal = new Big(0)
-    let anotherTotal = new Big(0)
-    Object.entries(totalBetsByMarket).forEach(([market, data]) => {
-      if (selectedMarket === market) {
-        myTotal = data.amount
-        return
-      }
-      anotherTotal = anotherTotal.plus(data.amount)
-    })
-
-    if (myTotal.eq(0)) return anotherTotal.plus(amount)
-
-    const myTotalWithMe = new Big(amount).plus(myTotal)
-    const proportion = new Big(amount).div(myTotalWithMe)
-    const won = proportion.mul(anotherTotal)
-
-    return won.plus(amount)
-  }, [totalBetsByMarket, selectedMarket, amount])
+  const handleMarket = () => {
+    setIsLoadBets(true)
+    onMarketClick(market)
+  }
 
   const handleHide = () => {
     setBidState("IDLE")
     setToggle(false)
+    setIsLoadBets(false)
   }
 
   return (
     <>
-      <li className={styles.item} onClick={() => onMarketClick(market)}>
+      <li className={styles.item} onClick={handleMarket}>
         <h4 className={styles.itemTitle}>
           <span>{market}</span>
-          <span>{totalBetsByMarket[market]?.percent || 0}%</span>
         </h4>
-        {isOpen && (
-          <div className={styles.itemInfo}>
-            <span>Bets: {totalBetsByMarket[market]?.count || 0}</span>
-            <span>
-              {totalBetsByMarket[market]?.amount.toString() || 0}{" "}
-              {data?.symbol || ""}
-            </span>
-          </div>
+        {isOpen && totalByMarket && data && (
+          <BetInfo
+            symbol={data.symbol}
+            amount={totalByMarket[market]?.amount.toString()}
+            count={totalByMarket[market]?.count}
+            percent={totalByMarket[market]?.percent || 0}
+          />
         )}
       </li>
       <Modal isShow={toggle} style={{ padding: 0 }} onHide={handleHide}>
         <div className={styles.modalBody}>
-          {bidState === "IDLE" && (
+          {bidState === "IDLE" && data && (
             <AddBetStateIdle
               amount={amount}
-              balance={data?.formatted || "0"}
+              balance={data.formatted}
               onAddBet={onAddBet}
               onAmountChange={onAmountChange}
-              potentialWin={calculatePotential}
+              potentialWin={potentialWon}
               selectedMarket={selectedMarket}
-              symbol={data?.symbol || ""}
+              symbol={data.symbol}
             />
           )}
           {bidState === "PENDING" && <AddBetStatePending />}

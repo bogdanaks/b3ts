@@ -1,4 +1,4 @@
-import Big from "big.js"
+import { Bets } from "app/Bets"
 import { ethers } from "ethers"
 import moment from "moment"
 import React from "react"
@@ -7,13 +7,13 @@ import { useAccount, useBalance } from "wagmi"
 
 import styles from "./styles.module.scss"
 
-export const BetsList = ({ match }: { match: MatchWithSmart }) => {
+export const BetsList = ({ bets }: { bets: Bets.BetStructOutput[] }) => {
   const account = useAccount()
   const { data } = useBalance({
     addressOrName: account.address,
   })
 
-  if (!match.matchFromSmart || !match.matchFromSmart.bets.length) {
+  if (!bets.length) {
     return (
       <div className={styles.wrapper}>
         <span>Not yet</span>
@@ -24,7 +24,7 @@ export const BetsList = ({ match }: { match: MatchWithSmart }) => {
   return (
     <div className={styles.wrapper}>
       <ul className={styles.list}>
-        {[...match.matchFromSmart.bets].reverse().map((bet, index) => (
+        {[...bets].reverse().map((bet, index) => (
           <li className={styles.listItem} key={index}>
             <span className={styles.listItemMarket}>{bet.market}</span>
             <span>{shortAddress(bet.user)}</span>
@@ -33,9 +33,7 @@ export const BetsList = ({ match }: { match: MatchWithSmart }) => {
               {data?.symbol || ""}
             </span>
             <span>
-              {moment(new Big(bet.createdAt).toNumber()).format(
-                "DD/MM HH:mm:ss"
-              )}
+              {moment(bet.createdAt.toNumber()).format("DD/MM HH:mm:ss")}
             </span>
           </li>
         ))}

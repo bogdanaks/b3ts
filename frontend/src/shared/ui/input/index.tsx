@@ -1,3 +1,4 @@
+import classNames from "classnames"
 import React, { ChangeEventHandler, HTMLAttributes } from "react"
 
 import styles from "./styles.module.scss"
@@ -6,18 +7,30 @@ interface InputProps extends HTMLAttributes<HTMLInputElement> {
   value: string
   onChange: ChangeEventHandler<HTMLInputElement>
   rightContent?: React.ReactNode
+  classNameWrapper?: string
+  classNameInput?: string
 }
 
-export const Input = ({ value, onChange, rightContent }: InputProps) => {
+export const Input = ({
+  value,
+  onChange,
+  rightContent,
+  classNameWrapper,
+  classNameInput,
+  ...props
+}: InputProps) => {
   return (
-    <div className={styles.wrapper}>
+    <div className={classNames(styles.inputWrapper, classNameWrapper)}>
       <input
-        className={styles.input}
+        className={classNames(styles.input, classNameInput)}
         type="text"
         value={value}
         onChange={onChange}
+        {...props}
       />
-      {rightContent && rightContent}
+      {rightContent && (
+        <div className={styles.rightContent}>{rightContent}</div>
+      )}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { ethers } from "hardhat"
 import { expect } from "chai"
+import { Bets } from "../typechain-types"
 
 describe("Bets", function () {
   async function deploy() {
@@ -12,8 +13,7 @@ describe("Bets", function () {
     return { bets, owner, otherAccount, otherAccount2 }
   }
 
-  async function createMatch(id = 1) {
-    const { bets } = await loadFixture(deploy)
+  async function createMatch(bets: Bets, id = 1) {
     const tx = await bets.createMatch(
       id,
       [
@@ -36,27 +36,30 @@ describe("Bets", function () {
   describe("Matches", function () {
     it("Create match", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch()
+      await createMatch(bets)
       expect(await bets.matchesLength()).to.equal(1)
+    })
+
+    it("Create match dublicate id", async function () {
+      const { bets } = await loadFixture(deploy)
+      await createMatch(bets, 1)
+      expect(createMatch(bets, 1)).to.be.revertedWith("Already created")
     })
 
     it("Update match", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch()
+      await createMatch(bets)
       expect(await bets.matchesLength()).to.equal(1)
       await bets.updateMatch(1, 2, ["TEAM_1"], Date.now())
-      const match = await bets.getMatches([1])
+      const match = await bets.getMatchesByIds([1])
       // console.log("updated match", match)
     })
 
     it("Get matches", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch(4)
-      await createMatch(5)
-      const matches = await bets.getMatches([4, 5])
-      console.log("matches", matches)
-      // TODO не работает, возвращает пустой и нормальный элеиенты
-
+      await createMatch(bets, 4)
+      await createMatch(bets, 5)
+      const matches = await bets.getMatchesByIds([4, 5])
       expect(matches.length).to.equal(2)
       expect(matches[0].id.toNumber()).to.equal(4)
       expect(matches[1].id.toNumber()).to.equal(5)
@@ -64,7 +67,7 @@ describe("Bets", function () {
 
     it("Get my matches", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch()
+      await createMatch(bets)
       await bets.addBet(1, "TEAM_1")
       const myMatches = await bets.getMyMatches(10, 0)
       expect(myMatches.length).to.equal(1)
@@ -75,15 +78,15 @@ describe("Bets", function () {
   describe("Bets", function () {
     it("Add bet", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch()
+      await createMatch(bets)
       await bets.addBet(1, "TEAM_1")
-      const match = await bets.getMatches([1])
+      const match = await bets.getMatchesByIds([1])
       // console.log("match", match)
     })
 
     it("Get bets by match id", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch()
+      await createMatch(bets)
       await bets.addBet(1, "TEAM_1", {
         value: ethers.utils.parseEther("15"),
       })
@@ -97,7 +100,7 @@ describe("Bets", function () {
       const { bets, owner, otherAccount, otherAccount2 } = await loadFixture(
         deploy
       )
-      await createMatch()
+      await createMatch(bets)
 
       await bets.addBet(1, "TEAM_1", {
         value: ethers.utils.parseEther("20"),

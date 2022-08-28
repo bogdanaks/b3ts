@@ -7,14 +7,16 @@ import classNames from "classnames"
 import { BetsList } from "entities/bet/ui/bets-list"
 import { AddBet } from "features/add-bet/ui"
 import { Card } from "shared/ui/card"
+import { useBets } from "entities/bet/model"
 
 interface MatchItemProps {
-  match: MatchWithSmart
+  match: Match
 }
 
 export const MatchItem = ({ match }: MatchItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenBets, setIsOpenBets] = useState(false)
+  const { bets } = useBets(match.id, isOpenBets)
 
   const handleArrowClick = () => {
     if (isOpen) {
@@ -32,7 +34,7 @@ export const MatchItem = ({ match }: MatchItemProps) => {
           <div className={styles.itemInfo}>
             <span className={styles.itemInfoTitle}>{match.title}</span>
             <span className={styles.itemInfoDate}>
-              {moment(match.created_at).format("DD/MM/YYYY hh:mm")}
+              {moment(match.start_at).format("DD/MM/YYYY hh:mm")}
             </span>
             <button
               onClick={() => setIsOpenBets(!isOpenBets)}
@@ -67,7 +69,7 @@ export const MatchItem = ({ match }: MatchItemProps) => {
           <IoArrowDown fontSize={20} />
         </div>
       </div>
-      {isOpenBets && <BetsList match={match} />}
+      {isOpenBets && <BetsList bets={bets} />}
     </Card>
   )
 }

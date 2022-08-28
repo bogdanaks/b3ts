@@ -1,16 +1,17 @@
-import { Contract, ethers } from "ethers"
+import { ethers } from "ethers"
 import React, { useEffect, useState } from "react"
 import { useSigner, useClient, useProvider } from "wagmi"
 import Big from "big.js"
 
 import contractABI from "shared/assets/contract.abi.json"
 import { config } from "shared/config"
+import { Bets } from "app/Bets"
 
 export const useMyContract = () => {
   const client = useClient()
   const { data: signer, status } = useSigner()
   const provider = useProvider()
-  const [contract, setContract] = useState<Contract | undefined>(undefined)
+  const [contract, setContract] = useState<Bets>()
   const [contractState, setContractState] = useState<
     "idle" | "connecting" | "connected" | "error"
   >("idle")
@@ -21,11 +22,11 @@ export const useMyContract = () => {
     if (client.status !== "connected") return
     setContractState("connecting")
     try {
-      const connectContract = new ethers.Contract(
+      const connectContract: Bets = new ethers.Contract(
         config.contractAddress,
         contractABI,
         signer
-      )
+      ) as Bets
       setContract(connectContract)
       setContractState("connected")
     } catch (error) {
@@ -33,21 +34,12 @@ export const useMyContract = () => {
     }
   }, [client, signer])
 
-  const getMatchesByIds = async (ids: number[]): Promise<MatchStruct[]> => {
+  const getMatchesByIds = async (
+    ids: number[]
+  ): Promise<Bets.MatchStructOutput[]> => {
     if (!contract) return []
-    const matches: any[] = await contract.getMatches(ids)
-    const clearMatches = matches.filter((item) => item.createdAt > 0)
-    const matchesFormatting = clearMatches.map((item) => {
-      return {
-        id: Big(item.id).toNumber(),
-        status: item.status,
-        wonMarkets: item.wonMarkets,
-        markets: item.markets,
-        bets: item.bets,
-        createdAt: Big(item.createdAt).toNumber(),
-      }
-    })
-    return matchesFormatting
+    const matches = await contract.getMatchesByIds(ids)
+    return matches.filter((item) => item.startAt.toNumber() > 0)
   }
 
   const getMyMatches = async ({
@@ -56,34 +48,33 @@ export const useMyContract = () => {
   }: {
     limit: number
     offset: number
-  }): Promise<MatchStruct[]> => {
+  }): Promise<Bets.MatchStructOutput[]> => {
     if (!contract) return []
-    const matches: any[] = await contract.getMyMatches(limit, offset)
-    const clearMatches = matches.filter((item) => item.createdAt > 0)
-    const matchesFormatting = clearMatches.map((item) => {
-      return {
-        id: Big(item.id).toNumber(),
-        status: item.status,
-        wonMarkets: item.wonMarkets,
-        markets: item.markets,
-        bets: item.bets,
-        createdAt: Big(item.createdAt).toNumber(),
-      }
-    })
-    return matchesFormatting
+    const matches = await contract.getMyMatches(limit, offset)
+    return matches.filter((item) => item.startAt.toNumber() > 0)
   }
 
   const getMatchesLength = async (): Promise<number | undefined> => {
     if (!contract) return
-    const matchesLength = await contract.matchesLength()
+    const matchesLength = await contract.matchId()
 
-    return new Big(matchesLength).toNumber()
+    return matchesLength.toNumber()
   }
 
-  const createMatch = async (id: number, markets: string[][]) => {
+  const createMatch = async (
+    markets: string[][],
+    startAt: number
+  ): Promise<ethers.ContractTransaction | undefined> => {
     if (!contract) return
-    await contract.createMatch(id, markets)
-    console.log("Creating match: ", id)
+    console.log("Creating match")
+    return await contract.createMatch(markets, startAt)
+  }
+
+  const getBetsByMatchId = async (
+    matchId: number
+  ): Promise<Bets.BetStructOutput[] | undefined> => {
+    if (!contract) return
+    return await contract.getBetsByMatchId(matchId)
   }
 
   const addBet = async (
@@ -151,6 +142,7 @@ export const useMyContract = () => {
     getMatchesLength,
     createMatch,
     addBet,
+    getBetsByMatchId,
     subscribeEvent,
     contractState,
   }

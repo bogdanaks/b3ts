@@ -26,6 +26,9 @@ export class Match {
   @PrimaryGeneratedColumn()
   id: string
 
+  @Column()
+  sc_id: string
+
   @Column({ length: 200 })
   title: string
 

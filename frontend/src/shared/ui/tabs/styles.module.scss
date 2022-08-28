@@ -12,7 +12,7 @@
 .tab {
   padding: 5px 10px;
   cursor: pointer;
-  color: #000;
+  color: #fff;
 }
 
 .body {
@@ -23,4 +23,7 @@
 
 .activeTab {
   background-color: $primary;
+  .tab {
+    color: #000;
+  }
 }

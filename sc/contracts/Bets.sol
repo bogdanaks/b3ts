@@ -11,7 +11,6 @@ contract Bets is Ownable {
 
     enum MatchStatus {
         CREATED,
-        RUNNING,
         FINISHED,
         CANCELED
     }
@@ -50,8 +49,8 @@ contract Bets is Ownable {
     uint32 constant MULTFACTOR = 1000000;
     bool public isPaused = false;
 
-    uint256 internal betId = 1;
-    uint256 public matchesLength = 0;
+    uint256 internal betId = 0;
+    uint256 public matchId = 0;
     uint256 private feePercent;
     address internal piggyBank;
     mapping(uint256 => Match) public matches;
@@ -73,22 +72,21 @@ contract Bets is Ownable {
     }
 
     // Match
-    function createMatch(
-        uint256 id,
-        string[][] memory marketsList,
-        uint256 startAt
-    ) public onlyIfRunning onlyOwner {
-        Match storage newMatch = matches[id];
-        require(newMatch.id == 0, "Already created"); // TODO проверить
-        newMatch.id = id;
+    function createMatch(string[][] memory marketsList, uint256 startAt)
+        public
+        onlyIfRunning
+        onlyOwner
+    {
+        matchId++;
+        Match storage newMatch = matches[matchId];
+        newMatch.id = matchId;
         newMatch.status = MatchStatus.CREATED;
         newMatch.markets = marketsList;
         newMatch.startAt = startAt;
-        matchesLength++;
-        emit CreateMatch(id, marketsList, startAt);
+        emit CreateMatch(matchId, marketsList, startAt);
     }
 
-    function getMatches(uint256[] memory ids)
+    function getMatchesByIds(uint256[] memory ids)
         public
         view
         returns (Match[] memory findMatches)
@@ -136,7 +134,7 @@ contract Bets is Ownable {
     }
 
     // Bets
-    function addBet(uint256 matchId, string memory market)
+    function addBet(uint256 _matchId, string memory _market)
         public
         payable
         onlyIfRunning
@@ -144,36 +142,36 @@ contract Bets is Ownable {
         Bet memory newBet = Bet(
             betId,
             msg.sender,
-            market,
+            _market,
             msg.value,
             block.timestamp
         );
-        bets[matchId].push(newBet);
-        userMatches[msg.sender].push(matchId);
+        bets[_matchId].push(newBet);
+        userMatches[msg.sender].push(_matchId);
 
-        emit AddBet(betId, matchId, msg.value, market, msg.sender);
+        emit AddBet(betId, _matchId, msg.value, _market, msg.sender);
         betId++;
     }
 
-    function getBetsByMatchId(uint256 matchId)
+    function getBetsByMatchId(uint256 _matchId)
         public
         view
         returns (Bet[] memory findBets)
     {
-        return bets[matchId];
+        return bets[_matchId];
     }
 
     // Withdraw
     // TODO фикс с новым типом ставок
-    function withdrawByMatchId(uint256 matchId) public onlyIfRunning {
-        Match memory findMatch = matches[matchId];
+    function withdrawByMatchId(uint256 _matchId) public onlyIfRunning {
+        Match memory findMatch = matches[_matchId];
         require(
             findMatch.status == MatchStatus.FINISHED ||
                 findMatch.status == MatchStatus.CANCELED,
             "Match status not completed"
         );
 
-        Bet[] memory findAllBets = getBetsByMatchId(matchId);
+        Bet[] memory findAllBets = getBetsByMatchId(_matchId);
         require(findAllBets.length > 0, "Bets not found");
 
         uint256 myTotalAmount;

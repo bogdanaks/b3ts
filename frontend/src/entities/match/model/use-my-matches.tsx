@@ -1,9 +1,12 @@
+import { useInfiniteQuery } from "@tanstack/react-query"
 import React, { useEffect, useState } from "react"
+import { fetcherMatchesBySport } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
 
 export const useMyMatches = (sport: string) => {
   const { getMyMatches, getMatchesLength, contractState, subscribeEvent } =
     useMyContract()
+  const [matchesLen, setMatchesLen] = useState(0)
   const [matches, setMatches] = useState<{
     pages: {
       data: MatchWithSmart[]
@@ -13,25 +16,32 @@ export const useMyMatches = (sport: string) => {
     pageParams: unknown[]
   } | null>(null)
   const [isSubscribe, setIsSubscribe] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [status, setStatus] = useState<
+    "IDLE" | "LOADING" | "SUCCESS" | "ERROR"
+  >("IDLE")
 
-  // const { isSuccess, data, fetchNextPage } = useInfiniteQuery(
-  //   ["matches", sport],
-  //   async ({ pageParam = 1 }) => {
-  //     const limit = 10
-  //     const res = await fetcherMatchesBySport(sport, limit, pageParam)()
+  const { isSuccess, data, fetchNextPage } = useInfiniteQuery(
+    ["matches", sport],
+    async ({ pageParam = 1 }) => {
+      const limit = 10
+      const res = await fetcherMatchesBySport(
+        sport,
+        matchesLen,
+        limit,
+        pageParam
+      )()
 
-  //     return {
-  //       data: res.data,
-  //       nextPage: Number(res.page) + 1,
-  //       isLastPage: Math.ceil(res.total / limit) === pageParam,
-  //     }
-  //   },
-  //   {
-  //     getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
-  //     enabled: !!sport,
-  //   }
-  // )
+      return {
+        data: res.data,
+        nextPage: Number(res.page) + 1,
+        isLastPage: Math.ceil(res.total / limit) === pageParam,
+      }
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+      enabled: !!sport && !!matchesLen,
+    }
+  )
 
   // const updateBets = ({
   //   id,
@@ -92,13 +102,10 @@ export const useMyMatches = (sport: string) => {
   useEffect(() => {
     if (contractState !== "connected") return // if (!isSuccess) return
     ;(async () => {
-      console.log("re")
-
       const mLen = await getMatchesLength()
-      console.log("mLen", mLen)
-
       if (!mLen) return
-      setIsLoading(true)
+      setStatus("LOADING")
+      setMatchesLen(mLen)
 
       // const copyData = { ...data } as {
       //   pages: {
@@ -109,9 +116,9 @@ export const useMyMatches = (sport: string) => {
       //   pageParams: unknown[]
       // }
 
-      const matchesSmartContract = await getMyMatches({ limit: 15, offset: 0 })
+      // const matchesSmartContract = await getMyMatches({ limit: 15, offset: 0 })
 
-      console.log("matchesSmartContract", matchesSmartContract)
+      // console.log("matchesSmartContract", matchesSmartContract)
 
       // for (const page of copyData.pages) {
       //   const matchesIds = page.data.map((item) => Number(item.id))
@@ -127,7 +134,6 @@ export const useMyMatches = (sport: string) => {
       //   }
       // }
 
-      setIsLoading(false)
       // setMatches(copyData)
     })()
   }, [contractState])
@@ -142,7 +148,6 @@ export const useMyMatches = (sport: string) => {
 
   return {
     // isLastPage: isSuccess && data.pages[data.pages.length - 1].isLastPage,
-    isLoading,
     // fetchNextPage,
     matches,
   }
