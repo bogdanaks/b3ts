@@ -13,9 +13,8 @@ describe("Bets", function () {
     return { bets, owner, otherAccount, otherAccount2 }
   }
 
-  async function createMatch(bets: Bets, id = 1) {
+  async function createMatch(bets: Bets) {
     const tx = await bets.createMatch(
-      id,
       [
         ["TEAM_1", "TEAM_2"],
         ["TOTAL_LS_10", "TOTAL_GR_10"],
@@ -37,19 +36,13 @@ describe("Bets", function () {
     it("Create match", async function () {
       const { bets } = await loadFixture(deploy)
       await createMatch(bets)
-      expect(await bets.matchesLength()).to.equal(1)
-    })
-
-    it("Create match dublicate id", async function () {
-      const { bets } = await loadFixture(deploy)
-      await createMatch(bets, 1)
-      expect(createMatch(bets, 1)).to.be.revertedWith("Already created")
+      expect(await bets.matchId()).to.equal(1)
     })
 
     it("Update match", async function () {
       const { bets } = await loadFixture(deploy)
       await createMatch(bets)
-      expect(await bets.matchesLength()).to.equal(1)
+      expect(await bets.matchId()).to.equal(1)
       await bets.updateMatch(1, 2, ["TEAM_1"], Date.now())
       const match = await bets.getMatchesByIds([1])
       // console.log("updated match", match)
@@ -57,17 +50,18 @@ describe("Bets", function () {
 
     it("Get matches", async function () {
       const { bets } = await loadFixture(deploy)
-      await createMatch(bets, 4)
-      await createMatch(bets, 5)
-      const matches = await bets.getMatchesByIds([4, 5])
+      await createMatch(bets)
+      await createMatch(bets)
+      const matches = await bets.getMatchesByIds([1, 2])
       expect(matches.length).to.equal(2)
-      expect(matches[0].id.toNumber()).to.equal(4)
-      expect(matches[1].id.toNumber()).to.equal(5)
+      expect(matches[0].id.toNumber()).to.equal(1)
+      expect(matches[1].id.toNumber()).to.equal(2)
     })
 
     it("Get my matches", async function () {
       const { bets } = await loadFixture(deploy)
       await createMatch(bets)
+      await bets.addBet(1, "TEAM_1")
       await bets.addBet(1, "TEAM_1")
       const myMatches = await bets.getMyMatches(10, 0)
       expect(myMatches.length).to.equal(1)
@@ -95,37 +89,37 @@ describe("Bets", function () {
     })
   })
 
-  describe("Withdraws", function () {
-    it("Withdraw my bets", async function () {
-      const { bets, owner, otherAccount, otherAccount2 } = await loadFixture(
-        deploy
-      )
-      await createMatch(bets)
+  // describe("Withdraws", function () {
+  //   it("Withdraw my bets", async function () {
+  //     const { bets, owner, otherAccount, otherAccount2 } = await loadFixture(
+  //       deploy
+  //     )
+  //     await createMatch(bets)
 
-      await bets.addBet(1, "TEAM_1", {
-        value: ethers.utils.parseEther("20"),
-      })
-      await bets.addBet(1, "TEAM_1", {
-        value: ethers.utils.parseEther("20"),
-      })
-      await bets.addBet(1, "TEAM_2", {
-        value: ethers.utils.parseEther("10"),
-      })
+  //     await bets.addBet(1, "TEAM_1", {
+  //       value: ethers.utils.parseEther("20"),
+  //     })
+  //     await bets.addBet(1, "TEAM_1", {
+  //       value: ethers.utils.parseEther("20"),
+  //     })
+  //     await bets.addBet(1, "TEAM_2", {
+  //       value: ethers.utils.parseEther("10"),
+  //     })
 
-      await bets.connect(otherAccount).addBet(1, "TEAM_1", {
-        value: ethers.utils.parseEther("40"),
-      })
-      await bets.connect(otherAccount).addBet(1, "TEAM_2", {
-        value: ethers.utils.parseEther("10"),
-      })
+  //     await bets.connect(otherAccount).addBet(1, "TEAM_1", {
+  //       value: ethers.utils.parseEther("40"),
+  //     })
+  //     await bets.connect(otherAccount).addBet(1, "TEAM_2", {
+  //       value: ethers.utils.parseEther("10"),
+  //     })
 
-      await bets.updateMatch(1, 2, ["TEAM_1"], Date.now())
-      const balancePiggyBankBefore = await otherAccount2.getBalance()
-      await bets.withdrawByMatchId(1)
-      const balancePiggyBankAfter = await otherAccount2.getBalance()
-      expect(balancePiggyBankAfter).to.equal(
-        balancePiggyBankBefore.add(ethers.utils.parseEther("1.25"))
-      )
-    })
-  })
+  //     await bets.updateMatch(1, 2, ["TEAM_1"], Date.now())
+  //     const balancePiggyBankBefore = await otherAccount2.getBalance()
+  //     await bets.withdrawByMatchId(1)
+  //     const balancePiggyBankAfter = await otherAccount2.getBalance()
+  //     expect(balancePiggyBankAfter).to.equal(
+  //       balancePiggyBankBefore.add(ethers.utils.parseEther("1.25"))
+  //     )
+  //   })
+  // })
 })

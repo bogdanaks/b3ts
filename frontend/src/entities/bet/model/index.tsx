@@ -62,8 +62,6 @@ export const useBets = (matchId: number, isOpen: boolean) => {
     })()
   }, [matchId, isOpen])
 
-  console.log("totalByMarket", totalByMarket)
-
   return {
     total,
     totalByMarket,

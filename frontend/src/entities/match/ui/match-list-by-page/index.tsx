@@ -3,10 +3,7 @@ import React from "react"
 import { MatchItem } from "../match-item"
 import { SkeletonMatch } from "../skeleton"
 
-export const MatchListByPage = ({
-  matches,
-  isLoading,
-}: {
+interface MatchListByPageProps {
   matches:
     | InfiniteData<{
         data: Match[]
@@ -15,7 +12,14 @@ export const MatchListByPage = ({
       }>
     | undefined
   isLoading: boolean
-}) => {
+  matchesLen: number
+}
+
+export const MatchListByPage = ({
+  matches,
+  isLoading,
+  matchesLen,
+}: MatchListByPageProps) => {
   return (
     <ul>
       {matches?.pages.map((page, indexPage) =>
@@ -23,7 +27,8 @@ export const MatchListByPage = ({
           <MatchItem key={`${indexPage}_${indexMatch}}`} match={match} />
         ))
       )}
-      {isLoading && <SkeletonMatch count={6} />}
+      {isLoading && !Boolean(matchesLen) && <h4>Not yet</h4>}
+      {isLoading && Boolean(matchesLen) && <SkeletonMatch count={6} />}
     </ul>
   )
 }

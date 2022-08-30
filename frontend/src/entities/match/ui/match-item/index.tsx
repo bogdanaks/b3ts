@@ -31,7 +31,9 @@ export const MatchItem = ({ match }: MatchItemProps) => {
     <Card className={styles.item} as="li">
       <div className={styles.itemWrapper}>
         <div className={styles.itemContent}>
-          <div className={styles.itemInfo}>
+          <div
+            className={classNames(styles.itemInfo, { [styles.isOpen]: isOpen })}
+          >
             <span className={styles.itemInfoTitle}>{match.title}</span>
             <span className={styles.itemInfoDate}>
               {moment(match.start_at).format("DD/MM/YYYY hh:mm")}

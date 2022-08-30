@@ -11,9 +11,8 @@ import { SportsBar } from "widgets/sports-bar"
 const SpotPage = () => {
   const { query } = useRouter()
   const { sport } = query
-  const { matches, isLoading, isLastPage, fetchNextPage } = useMatches(
-    String(sport)
-  )
+  const { matches, isLoading, isLastPage, fetchNextPage, matchesLen } =
+    useMatches(String(sport))
 
   const handleScroll = () => {
     const userScrollHeight = window.innerHeight + window.scrollY
@@ -42,7 +41,13 @@ const SpotPage = () => {
         <Tabs style={{ marginTop: 20 }}>
           <Tabs.Tab
             title="Matches"
-            body={<MatchListByPage matches={matches} isLoading={isLoading} />}
+            body={
+              <MatchListByPage
+                matches={matches}
+                isLoading={isLoading}
+                matchesLen={matchesLen}
+              />
+            }
           />
           <></>
         </Tabs>

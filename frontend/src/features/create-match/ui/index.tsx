@@ -1,7 +1,9 @@
+import { Wallet } from "widgets/wallet/ui"
 import React, { FormEvent } from "react"
 import { Button } from "shared/ui/button"
 import { Input } from "shared/ui/input"
 import { Modal } from "shared/ui/modal"
+import { useAccount } from "wagmi"
 import { useCreateMatch } from "../model"
 import { CreateMatchStateDbError } from "./states/db_error"
 import { CreateMatchStatePending } from "./states/pending"
@@ -23,6 +25,7 @@ export const CreateMatch = () => {
     state,
     matchId,
   } = useCreateMatch()
+  const { address } = useAccount()
 
   const handleHide = () => {
     setState("IDLE")
@@ -39,8 +42,6 @@ export const CreateMatch = () => {
     setToggle(true)
     await onCreateMatch()
   }
-
-  console.log(state)
 
   return (
     <div className={styles.wrapper}>
@@ -75,7 +76,11 @@ export const CreateMatch = () => {
           onChange={(e) => onInputChange(e, "start_at")}
           classNameWrapper={styles.input}
         />
-        <Button>Create match</Button>
+        {address ? (
+          <Button className={styles.btn}>Create match</Button>
+        ) : (
+          <Wallet />
+        )}
       </form>
       <Modal isShow={toggle} style={{ padding: 0 }} onHide={handleHide}>
         <div className={styles.modalBody}>

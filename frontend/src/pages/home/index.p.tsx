@@ -8,7 +8,7 @@ const HomePage = () => {
     <div>
       <Header />
       <Wrapper>
-        <SportsBar />
+        <SportsBar rootRoute="sports" />
       </Wrapper>
     </div>
   )

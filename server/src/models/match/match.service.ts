@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common"
+import { BadRequestException, Inject, Injectable } from "@nestjs/common"
 import { In, Repository } from "typeorm"
 
 import { Match, MatchStatus } from "./entities/match.entity"
@@ -51,7 +51,7 @@ export class MatchService {
     })
   }
 
-  createMatch({
+  async createMatch({
     sc_id,
     status,
     title,
@@ -66,8 +66,13 @@ export class MatchService {
     markets: string
     start_at: number
   }): Promise<Match> {
-    const statusString = this.getStatusByNumber(status)
-    return this.matchRepository.save({
+    const findMatch = await this.findOne(String(sc_id))
+    if (findMatch) {
+      throw new BadRequestException("Already created")
+    }
+
+    const statusString = await this.getStatusByNumber(status)
+    return await this.matchRepository.save({
       sc_id: String(sc_id),
       title,
       sport_id,

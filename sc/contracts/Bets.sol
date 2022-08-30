@@ -55,7 +55,8 @@ contract Bets is Ownable {
     address internal piggyBank;
     mapping(uint256 => Match) public matches;
     mapping(uint256 => Bet[]) public bets;
-    mapping(address => uint256[]) public userMatches;
+    mapping(address => uint256[]) internal userMatches;
+    mapping(address => mapping(uint256 => bool)) internal userMatchesExists;
 
     constructor(uint256 _feePercent, address _piggyBank) {
         feePercent = _feePercent;
@@ -86,6 +87,14 @@ contract Bets is Ownable {
         emit CreateMatch(matchId, marketsList, startAt);
     }
 
+    function getMatchesByAddress()
+        public
+        view
+        returns (uint256[] memory matchesId)
+    {
+        return userMatches[msg.sender];
+    }
+
     function getMatchesByIds(uint256[] memory ids)
         public
         view
@@ -93,9 +102,7 @@ contract Bets is Ownable {
     {
         Match[] memory _matchesList = new Match[](ids.length);
         for (uint256 i = 0; i < ids.length; i++) {
-            console.log("ids id", ids[i]);
             Match memory _findMatch = matches[ids[i]];
-            console.log("_findMatch id", _findMatch.id);
             _matchesList[i] = _findMatch;
         }
         return _matchesList;
@@ -110,6 +117,7 @@ contract Bets is Ownable {
         uint256 matchesCount = userMatches[msg.sender].length >= limit
             ? limit
             : userMatches[msg.sender].length;
+        console.log("matchesCount", matchesCount);
         Match[] memory _matchesList = new Match[](matchesCount);
         for (uint8 i = 0; i < limit; i++) {
             if (userMatches[msg.sender].length == i) break;
@@ -147,7 +155,10 @@ contract Bets is Ownable {
             block.timestamp
         );
         bets[_matchId].push(newBet);
-        userMatches[msg.sender].push(_matchId);
+        if (!userMatchesExists[msg.sender][_matchId]) {
+            userMatches[msg.sender].push(_matchId);
+            userMatchesExists[msg.sender][_matchId] = true;
+        }
 
         emit AddBet(betId, _matchId, msg.value, _market, msg.sender);
         betId++;

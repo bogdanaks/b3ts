@@ -3,11 +3,11 @@ import { useToggle } from "shared/hooks/use-toggle"
 import React, { ChangeEvent, useState } from "react"
 import { ContractTransaction } from "ethers"
 import { createMatchAPI } from "shared/api"
+import { useAccount } from "wagmi"
 
 export const useCreateMatch = () => {
   const { toggle, setToggle } = useToggle()
   const { createMatch } = useMyContract()
-  const [error, setError] = useState("")
   const [matchId, setMatchId] = useState<number | undefined>()
 
   const [state, setState] = useState<
@@ -64,8 +64,6 @@ export const useCreateMatch = () => {
       )
       if (!tx) return
     } catch (error) {
-      console.log("err", error)
-
       setState("REJECTED")
       return
     }

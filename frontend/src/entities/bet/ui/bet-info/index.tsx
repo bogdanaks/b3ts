@@ -13,7 +13,7 @@ export const BetInfo = ({ symbol, count, percent, amount }: BetInfoProps) => {
   return (
     <div className={styles.wrapper}>
       <span>
-        <span className={styles.gray}>Pct.</span>
+        <span className={styles.gray}>Pct. </span>
         {percent || 0}%
       </span>
       <span>

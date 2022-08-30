@@ -4,8 +4,7 @@ import { fetcherMatchesBySport } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
 
 export const useMatches = (sport: string) => {
-  const { getMatchesByIds, getMatchesLength, contractState, subscribeEvent } =
-    useMyContract()
+  const { getMatchesLength, contractState, subscribeEvent } = useMyContract()
   const [matches, setMatches] = useState<Match[]>([])
   const [matchesLen, setMatchesLen] = useState(0)
   // const [isSubscribe, setIsSubscribe] = useState(false)
@@ -149,5 +148,6 @@ export const useMatches = (sport: string) => {
     isLastPage: isSuccess && data.pages[data.pages.length - 1].isLastPage,
     matches: data,
     fetchNextPage,
+    matchesLen,
   }
 }

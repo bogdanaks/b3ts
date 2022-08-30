@@ -57,12 +57,14 @@ export const AddBet = ({
         <h4 className={styles.itemTitle}>
           <span>{market}</span>
         </h4>
-        {isOpen && totalByMarket && data && (
+        {isOpen && data && (
           <BetInfo
             symbol={data.symbol}
-            amount={totalByMarket[market]?.amount.toString()}
-            count={totalByMarket[market]?.count}
-            percent={totalByMarket[market]?.percent || 0}
+            amount={
+              totalByMarket ? totalByMarket[market]?.amount.toString() : "0"
+            }
+            count={totalByMarket ? totalByMarket[market]?.count : 0}
+            percent={totalByMarket ? totalByMarket[market]?.percent || 0 : 0}
           />
         )}
       </li>

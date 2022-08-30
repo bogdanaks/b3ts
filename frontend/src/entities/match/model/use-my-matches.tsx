@@ -4,7 +4,7 @@ import { fetcherMatchesBySport } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
 
 export const useMyMatches = (sport: string) => {
-  const { getMyMatches, getMatchesLength, contractState, subscribeEvent } =
+  const { getMyMatches, getMatchesLength, contractState, subscribeEvent, getBetsByMatchId } =
     useMyContract()
   const [matchesLen, setMatchesLen] = useState(0)
   const [matches, setMatches] = useState<{
@@ -100,7 +100,7 @@ export const useMyMatches = (sport: string) => {
   // }
 
   useEffect(() => {
-    if (contractState !== "connected") return // if (!isSuccess) return
+    if (contractState !== "connected") return
     ;(async () => {
       const mLen = await getMatchesLength()
       if (!mLen) return
@@ -116,9 +116,9 @@ export const useMyMatches = (sport: string) => {
       //   pageParams: unknown[]
       // }
 
-      // const matchesSmartContract = await getMyMatches({ limit: 15, offset: 0 })
+      const matchesSmartContract = await getMyMatches({ limit: 10, offset: 0 })
 
-      // console.log("matchesSmartContract", matchesSmartContract)
+      console.log("matchesSmartContract", matchesSmartContract)
 
       // for (const page of copyData.pages) {
       //   const matchesIds = page.data.map((item) => Number(item.id))
