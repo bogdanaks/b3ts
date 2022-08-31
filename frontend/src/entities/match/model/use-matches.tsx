@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import { fetcherMatchesByIds } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
 import { generateArrayNumbersFromTo } from "shared/lib/generate-array-numbers"
+import { mockMatches } from "shared/mock"
 
 export const useMatches = (sport: string) => {
   const { getMatchesLength, contractState } = useMyContract()
@@ -156,7 +157,7 @@ export const useMatches = (sport: string) => {
   return {
     isLoading,
     isLastPage,
-    matches,
+    matches: data || mockMatches,
     fetchNextPage,
   }
 }
