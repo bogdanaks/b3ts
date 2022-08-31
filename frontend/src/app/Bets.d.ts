@@ -81,6 +81,7 @@ export interface BetsInterface extends utils.Interface {
     "changeStateContract(bool)": FunctionFragment
     "createMatch(string[][],uint256)": FunctionFragment
     "getBetsByMatchId(uint256)": FunctionFragment
+    "getMatchesByAddress()": FunctionFragment
     "getMatchesByIds(uint256[])": FunctionFragment
     "getMyMatches(uint8,uint64)": FunctionFragment
     "isPaused()": FunctionFragment
@@ -90,7 +91,6 @@ export interface BetsInterface extends utils.Interface {
     "renounceOwnership()": FunctionFragment
     "transferOwnership(address)": FunctionFragment
     "updateMatch(uint256,uint8,string[],uint256)": FunctionFragment
-    "userMatches(address,uint256)": FunctionFragment
     "withdrawByMatchId(uint256)": FunctionFragment
   }
 
@@ -101,6 +101,7 @@ export interface BetsInterface extends utils.Interface {
       | "changeStateContract"
       | "createMatch"
       | "getBetsByMatchId"
+      | "getMatchesByAddress"
       | "getMatchesByIds"
       | "getMyMatches"
       | "isPaused"
@@ -110,7 +111,6 @@ export interface BetsInterface extends utils.Interface {
       | "renounceOwnership"
       | "transferOwnership"
       | "updateMatch"
-      | "userMatches"
       | "withdrawByMatchId"
   ): FunctionFragment
 
@@ -133,6 +133,10 @@ export interface BetsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getBetsByMatchId",
     values: [PromiseOrValue<BigNumberish>]
+  ): string
+  encodeFunctionData(
+    functionFragment: "getMatchesByAddress",
+    values?: undefined
   ): string
   encodeFunctionData(
     functionFragment: "getMatchesByIds",
@@ -167,10 +171,6 @@ export interface BetsInterface extends utils.Interface {
     ]
   ): string
   encodeFunctionData(
-    functionFragment: "userMatches",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
-  ): string
-  encodeFunctionData(
     functionFragment: "withdrawByMatchId",
     values: [PromiseOrValue<BigNumberish>]
   ): string
@@ -184,6 +184,10 @@ export interface BetsInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "createMatch", data: BytesLike): Result
   decodeFunctionResult(
     functionFragment: "getBetsByMatchId",
+    data: BytesLike
+  ): Result
+  decodeFunctionResult(
+    functionFragment: "getMatchesByAddress",
     data: BytesLike
   ): Result
   decodeFunctionResult(
@@ -207,7 +211,6 @@ export interface BetsInterface extends utils.Interface {
     data: BytesLike
   ): Result
   decodeFunctionResult(functionFragment: "updateMatch", data: BytesLike): Result
-  decodeFunctionResult(functionFragment: "userMatches", data: BytesLike): Result
   decodeFunctionResult(
     functionFragment: "withdrawByMatchId",
     data: BytesLike
@@ -340,6 +343,10 @@ export interface Bets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[Bets.BetStructOutput[]] & { findBets: Bets.BetStructOutput[] }>
 
+    getMatchesByAddress(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { matchesId: BigNumber[] }>
+
     getMatchesByIds(
       ids: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
@@ -389,12 +396,6 @@ export interface Bets extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>
 
-    userMatches(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>
-
     withdrawByMatchId(
       _matchId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -436,6 +437,8 @@ export interface Bets extends BaseContract {
     _matchId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<Bets.BetStructOutput[]>
+
+  getMatchesByAddress(overrides?: CallOverrides): Promise<BigNumber[]>
 
   getMatchesByIds(
     ids: PromiseOrValue<BigNumberish>[],
@@ -482,12 +485,6 @@ export interface Bets extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>
 
-  userMatches(
-    arg0: PromiseOrValue<string>,
-    arg1: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>
-
   withdrawByMatchId(
     _matchId: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -529,6 +526,8 @@ export interface Bets extends BaseContract {
       _matchId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<Bets.BetStructOutput[]>
+
+    getMatchesByAddress(overrides?: CallOverrides): Promise<BigNumber[]>
 
     getMatchesByIds(
       ids: PromiseOrValue<BigNumberish>[],
@@ -572,12 +571,6 @@ export interface Bets extends BaseContract {
       startAt: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>
-
-    userMatches(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>
 
     withdrawByMatchId(
       _matchId: PromiseOrValue<BigNumberish>,
@@ -664,6 +657,8 @@ export interface Bets extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>
 
+    getMatchesByAddress(overrides?: CallOverrides): Promise<BigNumber>
+
     getMatchesByIds(
       ids: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
@@ -703,12 +698,6 @@ export interface Bets extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>
 
-    userMatches(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>
-
     withdrawByMatchId(
       _matchId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -741,6 +730,10 @@ export interface Bets extends BaseContract {
 
     getBetsByMatchId(
       _matchId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>
+
+    getMatchesByAddress(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>
 
@@ -781,12 +774,6 @@ export interface Bets extends BaseContract {
       wonMarkets: PromiseOrValue<string>[],
       startAt: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>
-
-    userMatches(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>
 
     withdrawByMatchId(

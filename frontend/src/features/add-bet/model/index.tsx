@@ -9,7 +9,7 @@ export const useAddBet = (match: Match, isOpen: boolean) => {
   const { toggle, setToggle } = useToggle()
   const [selectedMarket, setSelectedMarket] = useState("")
   const { addBet } = useMyContract()
-  const { total, bets, totalByMarket } = useBets(match.id, isOpen)
+  const { total, bets, totalByMarket } = useBets(match.sc_id, isOpen)
   const [amount, setAmount] = useState("0")
   const [bidState, setBidState] = useState<
     "IDLE" | "PROCESSING" | "SUCCESS" | "REJECTED" | "PENDING"
@@ -60,7 +60,7 @@ export const useAddBet = (match: Match, isOpen: boolean) => {
     setBidState("PENDING")
     let tx
     try {
-      tx = await addBet(match.id, selectedMarket, amount)
+      tx = await addBet(match.sc_id, selectedMarket, amount)
       if (!tx) return
     } catch (error) {
       setBidState("REJECTED")

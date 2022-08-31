@@ -57,24 +57,18 @@ export const useWalletModel = () => {
   }
 
   const connectMM = async () => {
-    console.log("click mm")
-
     onChangeStep(2)
     setState("CONNECTING")
     connect({ connector: connectors[0] })
   }
 
   const connectWC = async () => {
-    console.log("click wc")
-
     onChangeStep(2)
     setState("CONNECTING")
     connect({ connector: connectors[1] })
   }
 
   const connectCB = async () => {
-    console.log("click cb")
-
     onChangeStep(2)
     setState("CONNECTING")
     connect({ connector: connectors[2] })

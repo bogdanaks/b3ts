@@ -4,6 +4,7 @@ type MatchStatus = "CREATED" | "RUNNING" | "FINISHED" | "CANCELED"
 
 type Match = {
   id: number
+  sc_id: number
   title: string
   markets: {
     [key: string]: string[]

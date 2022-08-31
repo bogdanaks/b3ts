@@ -1,48 +1,24 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import React, { useEffect, useState } from "react"
-import { fetcherMatchesBySport } from "shared/api"
+import { fetcherMatchesByIds } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
 
 export const useMyMatches = (sport: string) => {
-  const { getMyMatches, getMatchesLength, contractState, subscribeEvent, getBetsByMatchId } =
-    useMyContract()
+  const { getMatchesLength, contractState, getMatchesByUser } = useMyContract()
   const [matchesLen, setMatchesLen] = useState(0)
-  const [matches, setMatches] = useState<{
-    pages: {
-      data: MatchWithSmart[]
-      nextPage: number
-      isLastPage: boolean
-    }[]
-    pageParams: unknown[]
-  } | null>(null)
-  const [isSubscribe, setIsSubscribe] = useState(false)
-  const [status, setStatus] = useState<
-    "IDLE" | "LOADING" | "SUCCESS" | "ERROR"
-  >("IDLE")
+  const [page, setPage] = useState(1)
+  const [matchesIds, setMatchesIds] = useState<number[]>([])
+  const [matches, setMatches] = useState<Match[]>([])
 
-  const { isSuccess, data, fetchNextPage } = useInfiniteQuery(
-    ["matches", sport],
-    async ({ pageParam = 1 }) => {
-      const limit = 10
-      const res = await fetcherMatchesBySport(
-        sport,
-        matchesLen,
-        limit,
-        pageParam
-      )()
-
-      return {
-        data: res.data,
-        nextPage: Number(res.page) + 1,
-        isLastPage: Math.ceil(res.total / limit) === pageParam,
-      }
-    },
+  const { isLoading, data } = useQuery(
+    ["matches_by_ids", matchesIds],
+    fetcherMatchesByIds(sport, matchesIds),
     {
-      getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
-      enabled: !!sport && !!matchesLen,
+      enabled: !!sport && !!matchesIds.length && !!matchesLen,
     }
   )
 
+  // TODO return
   // const updateBets = ({
   //   id,
   //   matchId,
@@ -99,56 +75,96 @@ export const useMyMatches = (sport: string) => {
   //   setIsLoading(false)
   // }
 
-  useEffect(() => {
-    if (contractState !== "connected") return
-    ;(async () => {
-      const mLen = await getMatchesLength()
-      if (!mLen) return
-      setStatus("LOADING")
-      setMatchesLen(mLen)
+  // useEffect(() => {
+  //   if (contractState !== "connected") return
+  //   if (!isSuccess) return
+  //   ;(async () => {
+  //     const mLen = await getMatchesLength()
+  //     if (!mLen) return
+  //     setIsLoading(true)
 
-      // const copyData = { ...data } as {
-      //   pages: {
-      //     data: MatchWithSmart[]
-      //     nextPage: number
-      //     isLastPage: boolean
-      //   }[]
-      //   pageParams: unknown[]
-      // }
+  //     const copyData = { ...data } as {
+  //       pages: {
+  //         data: MatchWithSmart[]
+  //         nextPage: number
+  //         isLastPage: boolean
+  //       }[]
+  //       pageParams: unknown[]
+  //     }
 
-      const matchesSmartContract = await getMyMatches({ limit: 10, offset: 0 })
+  //     for (const page of copyData.pages) {
+  //       const matchesIds = page.data.map((item) => Number(item.id))
+  //       const matchesSmartContract = await getMatchesByIds(matchesIds)
+  //       for (const match of page.data) {
+  //         const matchFind = matchesSmartContract.find(
+  //           (item) => Number(item.id) === Number(match.id)
+  //         )
+  //         if (!matchFind) {
+  //           match.matchFromSmart = null
+  //         }
 
-      console.log("matchesSmartContract", matchesSmartContract)
+  //         match.matchFromSmart = matchFind
+  //       }
+  //     }
 
-      // for (const page of copyData.pages) {
-      //   const matchesIds = page.data.map((item) => Number(item.id))
-      //   const matchesSmartContract = await getMyMatches()
-
-      //   for (const match of page.data) {
-      //     const matchFind = matchesSmartContract.find(
-      //       (item) => Number(item.id) === Number(match.id)
-      //     )
-      //     if (!matchFind) continue
-
-      //     match.matchFromSmart = matchFind || null
-      //   }
-      // }
-
-      // setMatches(copyData)
-    })()
-  }, [contractState])
+  //     setIsLoading(false)
+  //     setMatches(copyData)
+  //   })()
+  // }, [data, contractState, isSuccess])
 
   // useEffect(() => {
   //   if (!matches) return
   //   if (contractState !== "connected") return
   //   if (isSubscribe) return
-  //   subscribeEvent("AddBet", updateBets)
+  //   // subscribeEvent("AddBet", updateBets)
   //   setIsSubscribe(true)
   // }, [matches, contractState])
 
+  const fetchNextPage = () => {
+    setPage((prevState) => ++prevState)
+  }
+
+  useEffect(() => {
+    if (contractState !== "connected") return
+    if (!matchesLen) return
+    ;(async () => {
+      const myMatches = await getMatchesByUser()
+      if (!myMatches || !myMatches.length) return
+
+      const myMatchesIds = myMatches.map((id) => id.toNumber()).reverse()
+      const myMatchesIdsSet = new Set(myMatchesIds)
+
+      if (page > Math.ceil(myMatchesIdsSet.size / 10)) {
+        return
+      }
+
+      const ids = myMatchesIds.splice(
+        (page - 1) * 10,
+        Math.min(10, myMatchesIdsSet.size) * page
+      )
+
+      setMatchesIds(ids)
+    })()
+  }, [contractState, matchesLen, page])
+
+  useEffect(() => {
+    if (!data) return
+
+    setMatches((prevState) => [...prevState, ...data.data])
+  }, [data])
+
+  useEffect(() => {
+    if (contractState !== "connected") return
+    ;(async () => {
+      const mLen = await getMatchesLength()
+      if (!mLen) return
+      setMatchesLen(mLen)
+    })()
+  }, [contractState])
+
   return {
-    // isLastPage: isSuccess && data.pages[data.pages.length - 1].isLastPage,
-    // fetchNextPage,
+    isLoading,
     matches,
+    fetchNextPage,
   }
 }

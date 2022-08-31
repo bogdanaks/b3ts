@@ -16,11 +16,22 @@ export const fetcherMatches = () => (): Promise<ResponseData<Match[]>> => {
   }).then((res) => res.json())
 }
 
-export const fetcherMatchesBySport =
-  (sport: string, matchesLen: number, limit: number, page: number) =>
+export const fetcherMatchesByIds =
+  (sport: string, matchesIds: number[]) =>
   (): Promise<ResponseData<Match[]>> => {
     return fetch(
-      `${config.API_URL}/match?status=CREATED&sport=${sport}&limit=${limit}&page=${page}&matchesLen=${matchesLen}`,
+      `${config.API_URL}/match?status=CREATED&sport=${sport}&matchesIds=${matchesIds}`,
+      {
+        method: "GET",
+      }
+    ).then((res) => res.json())
+  }
+
+export const fetcherMatchesBySport =
+  (sport: string, limit: number, page: number) =>
+  (): Promise<ResponseData<Match[]>> => {
+    return fetch(
+      `${config.API_URL}/match?status=CREATED&sport=${sport}&limit=${limit}&page=${page}`,
       {
         method: "GET",
       }

@@ -16,7 +16,7 @@ interface MatchItemProps {
 export const MatchItem = ({ match }: MatchItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenBets, setIsOpenBets] = useState(false)
-  const { bets } = useBets(match.id, isOpenBets)
+  const { bets } = useBets(match.sc_id, isOpenBets)
 
   const handleArrowClick = () => {
     if (isOpen) {
@@ -34,7 +34,9 @@ export const MatchItem = ({ match }: MatchItemProps) => {
           <div
             className={classNames(styles.itemInfo, { [styles.isOpen]: isOpen })}
           >
-            <span className={styles.itemInfoTitle}>{match.title}</span>
+            <span className={styles.itemInfoTitle}>
+              {match.sc_id} - {match.title}
+            </span>
             <span className={styles.itemInfoDate}>
               {moment(match.start_at).format("DD/MM/YYYY hh:mm")}
             </span>

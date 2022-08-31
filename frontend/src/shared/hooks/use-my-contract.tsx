@@ -51,12 +51,12 @@ export const useMyContract = () => {
   }): Promise<Bets.MatchStructOutput[]> => {
     if (!contract) return []
     try {
+      const address = await signer?.getAddress()
+      if (!address) return []
       const matches = await contract.getMyMatches(limit, offset)
-      console.log("matches", matches)
-
       return matches.filter((item) => item.startAt.toNumber() > 0)
     } catch (error) {
-      console.log(`err`, error)
+      console.log(`error`, error)
     }
     return []
   }
@@ -80,8 +80,7 @@ export const useMyContract = () => {
   const getMatchesByUser = async () => {
     if (!contract) return
     if (!signer) return
-    const address = await signer.getAddress()
-    return await contract.userMatches(address)
+    return await contract.getMatchesByAddress()
   }
 
   const getBetsByMatchId = async (
@@ -157,6 +156,7 @@ export const useMyContract = () => {
     createMatch,
     addBet,
     getBetsByMatchId,
+    getMatchesByUser,
     subscribeEvent,
     contractState,
   }

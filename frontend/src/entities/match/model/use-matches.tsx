@@ -1,36 +1,24 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import React, { useEffect, useState } from "react"
-import { fetcherMatchesBySport } from "shared/api"
+import { fetcherMatchesByIds } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
+import { generateArrayNumbersFromTo } from "shared/lib/generate-array-numbers"
 
 export const useMatches = (sport: string) => {
-  const { getMatchesLength, contractState, subscribeEvent } = useMyContract()
-  const [matches, setMatches] = useState<Match[]>([])
+  const { getMatchesLength, contractState } = useMyContract()
   const [matchesLen, setMatchesLen] = useState(0)
-  // const [isSubscribe, setIsSubscribe] = useState(false)
-  const { data, fetchNextPage, isLoading, isSuccess, isFetching } =
-    useInfiniteQuery(
-      ["matches", sport],
-      async ({ pageParam = 1 }) => {
-        const limit = 10
-        const res = await fetcherMatchesBySport(
-          sport,
-          matchesLen,
-          limit,
-          pageParam
-        )()
+  const [page, setPage] = useState(1)
+  const [isLastPage, setIsLastPage] = useState(false)
+  const [matchesIds, setMatchesIds] = useState<number[]>([])
+  const [matches, setMatches] = useState<Match[]>([])
 
-        return {
-          data: res.data,
-          nextPage: Number(res.page) + 1,
-          isLastPage: Math.ceil(res.total / limit) === pageParam,
-        }
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
-        enabled: !!sport && !!matchesLen,
-      }
-    )
+  const { isLoading, data, isSuccess } = useQuery(
+    ["matches_by_ids", matchesIds],
+    fetcherMatchesByIds(sport, matchesIds),
+    {
+      enabled: !!sport && !!matchesIds.length && !!matchesLen,
+    }
+  )
 
   // TODO return
   // const updateBets = ({
@@ -134,6 +122,28 @@ export const useMatches = (sport: string) => {
   //   setIsSubscribe(true)
   // }, [matches, contractState])
 
+  const fetchNextPage = () => {
+    setPage((prevState) => ++prevState)
+  }
+
+  useEffect(() => {
+    if (!matchesLen) return
+    if (isLastPage) return
+    const ids = generateArrayNumbersFromTo(
+      matchesLen - 10 * page,
+      matchesLen - 10 * page + 10
+    ).filter((i) => i > 0)
+    setMatchesIds(ids)
+    if (ids[0] === 1) {
+      setIsLastPage(true)
+    }
+  }, [matchesLen, page, isLastPage])
+
+  useEffect(() => {
+    if (!data) return
+    setMatches((prevState) => [...prevState, ...data.data])
+  }, [data])
+
   useEffect(() => {
     if (contractState !== "connected") return
     ;(async () => {
@@ -144,10 +154,9 @@ export const useMatches = (sport: string) => {
   }, [contractState])
 
   return {
-    isLoading: isLoading || isFetching,
-    isLastPage: isSuccess && data.pages[data.pages.length - 1].isLastPage,
-    matches: data,
+    isLoading,
+    isLastPage,
+    matches,
     fetchNextPage,
-    matchesLen,
   }
 }

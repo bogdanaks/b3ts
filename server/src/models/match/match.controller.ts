@@ -24,14 +24,20 @@ export class MatchController {
     @Query("status") status: MatchStatus,
     @Query("sport") sport: string,
     @Query("limit") limit = 10,
-    @Query("matchesLen") matchesLen: number,
+    @Query("matchesIds") matchesIds: string,
     @Query("page") page = 1
   ): Promise<{ data: Match[]; limit: number; page: number; total: number }> {
-    const count = await this.matchService.count({ status, sport })
+    const ids = matchesIds.split(",").map((i) => Number(i))
+    const count = await this.matchService.count({
+      status,
+      sport,
+      matchesIds: ids
+    })
+
     const matches = await this.matchService.findAll({
       status,
       sport,
-      matchesLen,
+      matchesIds: ids,
       limit,
       page
     })

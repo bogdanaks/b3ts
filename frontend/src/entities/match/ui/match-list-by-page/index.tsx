@@ -1,34 +1,34 @@
-import { InfiniteData } from "@tanstack/react-query"
-import React from "react"
+import React, { useEffect } from "react"
+import { useInView } from "react-intersection-observer"
 import { MatchItem } from "../match-item"
 import { SkeletonMatch } from "../skeleton"
 
 interface MatchListByPageProps {
-  matches:
-    | InfiniteData<{
-        data: Match[]
-        nextPage: number
-        isLastPage: boolean
-      }>
-    | undefined
+  matches: Match[]
   isLoading: boolean
-  matchesLen: number
+  fetchNextPage: () => void
 }
 
 export const MatchListByPage = ({
   matches,
   isLoading,
-  matchesLen,
+  fetchNextPage,
 }: MatchListByPageProps) => {
+  const { ref, inView } = useInView()
+
+  useEffect(() => {
+    if (!inView) return
+    fetchNextPage()
+  }, [inView])
+
   return (
     <ul>
-      {matches?.pages.map((page, indexPage) =>
-        page.data.map((match, indexMatch) => (
-          <MatchItem key={`${indexPage}_${indexMatch}}`} match={match} />
-        ))
-      )}
-      {isLoading && !Boolean(matchesLen) && <h4>Not yet</h4>}
-      {isLoading && Boolean(matchesLen) && <SkeletonMatch count={6} />}
+      {!isLoading && !matches.length && <h4>Not yet</h4>}
+      {matches.map((match, index) => (
+        <MatchItem key={index} match={match} />
+      ))}
+      <div ref={ref} />
+      {isLoading && <SkeletonMatch count={6} />}
     </ul>
   )
 }

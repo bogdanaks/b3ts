@@ -12,6 +12,7 @@ import { CreateMatchStateRejected } from "./states/rejected"
 import { CreateMatchStateSuccess } from "./states/success"
 
 import styles from "./styles.module.scss"
+import useIsMounted from "shared/hooks/use-is-mounted"
 
 export const CreateMatch = () => {
   const {
@@ -26,6 +27,7 @@ export const CreateMatch = () => {
     matchId,
   } = useCreateMatch()
   const { address } = useAccount()
+  const isMounted = useIsMounted()
 
   const handleHide = () => {
     setState("IDLE")
@@ -42,6 +44,8 @@ export const CreateMatch = () => {
     setToggle(true)
     await onCreateMatch()
   }
+
+  if (!isMounted()) return null
 
   return (
     <div className={styles.wrapper}>

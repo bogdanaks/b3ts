@@ -113,17 +113,24 @@ contract Bets is Ownable {
         view
         returns (Match[] memory findMatches)
     {
+        console.log(
+            "userMatches[msg.sender].length",
+            userMatches[msg.sender].length
+        );
         require(userMatches[msg.sender].length > 0, "Not found");
         uint256 matchesCount = userMatches[msg.sender].length >= limit
             ? limit
             : userMatches[msg.sender].length;
         console.log("matchesCount", matchesCount);
+
         Match[] memory _matchesList = new Match[](matchesCount);
         for (uint8 i = 0; i < limit; i++) {
             if (userMatches[msg.sender].length == i) break;
             Match memory _findMatch = matches[
                 userMatches[msg.sender][i + offset]
             ];
+            console.log("i + offset", i + offset);
+            console.log("_findMatch", _findMatch.id);
             _matchesList[i] = _findMatch;
         }
         return _matchesList;

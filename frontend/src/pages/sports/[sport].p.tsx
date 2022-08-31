@@ -1,4 +1,5 @@
 import { useMatches } from "entities/match/model/use-matches"
+import { MatchList } from "entities/match/ui/match-list"
 import { MatchListByPage } from "entities/match/ui/match-list-by-page"
 import { useRouter } from "next/router"
 import React, { useEffect } from "react"
@@ -11,26 +12,9 @@ import { SportsBar } from "widgets/sports-bar"
 const SpotPage = () => {
   const { query } = useRouter()
   const { sport } = query
-  const { matches, isLoading, isLastPage, fetchNextPage, matchesLen } =
-    useMatches(String(sport))
-
-  const handleScroll = () => {
-    const userScrollHeight = window.innerHeight + window.scrollY
-    const windowBottomHeight = document.documentElement.offsetHeight
-
-    if (userScrollHeight + 2 >= windowBottomHeight) {
-      fetchNextPage()
-    }
-  }
-
-  useEffect(() => {
-    if (isLastPage) return
-    window.addEventListener("scroll", handleScroll)
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [isLastPage])
+  const { matches, isLoading, fetchNextPage, isLastPage } = useMatches(
+    String(sport)
+  )
 
   if (!sport) return
   return (
@@ -45,7 +29,7 @@ const SpotPage = () => {
               <MatchListByPage
                 matches={matches}
                 isLoading={isLoading}
-                matchesLen={matchesLen}
+                fetchNextPage={fetchNextPage}
               />
             }
           />

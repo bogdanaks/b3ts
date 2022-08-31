@@ -12,35 +12,39 @@ export class MatchService {
 
   count({
     status,
-    sport
+    sport,
+    matchesIds
   }: {
     status: MatchStatus
     sport?: string
+    matchesIds?: number[]
   }): Promise<number> {
     return this.matchRepository.count({
-      where: { status, sport: { slug: sport } }
+      where: { status, sport: { slug: sport }, sc_id: In(matchesIds) }
     })
   }
 
   findAll({
     status,
     sport,
-    matchesLen,
+    matchesIds,
     limit,
     page
   }: {
     status: MatchStatus
     sport?: string
-    matchesLen?: number
+    matchesIds?: number[]
     limit?: number
     page?: number
   }): Promise<Match[]> {
-    const sc_ids = Array.from({ length: matchesLen }, (_, i) => i + 1)
     return this.matchRepository.find({
-      where: { status, sport: { slug: sport }, sc_id: In(sc_ids) },
+      where: { status, sport: { slug: sport }, sc_id: In(matchesIds) },
       relations: ["sport"],
       take: limit,
-      skip: limit * page - limit
+      skip: limit * page - limit,
+      order: {
+        start_at: "DESC"
+      }
     })
   }
 
