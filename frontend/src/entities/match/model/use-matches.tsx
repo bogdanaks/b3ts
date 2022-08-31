@@ -2,6 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import React, { useEffect, useState } from "react"
 import { fetcherMatchesBySport } from "shared/api"
 import { useMyContract } from "shared/hooks/use-my-contract"
+import { mockMatches } from "shared/mock"
 
 export const useMatches = (sport: string) => {
   const { getMatchesLength, contractState, subscribeEvent } = useMyContract()
@@ -146,7 +147,7 @@ export const useMatches = (sport: string) => {
   return {
     isLoading: isLoading || isFetching,
     isLastPage: isSuccess && data.pages[data.pages.length - 1].isLastPage,
-    matches: data,
+    matches: data || mockMatches,
     fetchNextPage,
     matchesLen,
   }

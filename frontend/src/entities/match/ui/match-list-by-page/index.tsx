@@ -22,12 +22,12 @@ export const MatchListByPage = ({
 }: MatchListByPageProps) => {
   return (
     <ul>
+      {isLoading && !Boolean(matches?.pages.length) && <h4>Not yet</h4>}
       {matches?.pages.map((page, indexPage) =>
         page.data.map((match, indexMatch) => (
           <MatchItem key={`${indexPage}_${indexMatch}}`} match={match} />
         ))
       )}
-      {isLoading && !Boolean(matchesLen) && <h4>Not yet</h4>}
       {isLoading && Boolean(matchesLen) && <SkeletonMatch count={6} />}
     </ul>
   )
