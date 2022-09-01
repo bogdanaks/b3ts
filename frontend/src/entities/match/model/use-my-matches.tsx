@@ -6,7 +6,9 @@ import { useMyContract } from "shared/hooks/use-my-contract"
 export const useMyMatches = (sport: string) => {
   const { getMatchesLength, contractState, getMatchesByUser } = useMyContract()
   const [matchesLen, setMatchesLen] = useState(0)
+  const [myMatchesLen, setMyMatchesLen] = useState(0)
   const [page, setPage] = useState(1)
+  const [isLastPage, setIsLastPage] = useState(false)
   const [matchesIds, setMatchesIds] = useState<number[]>([])
   const [matches, setMatches] = useState<Match[]>([])
 
@@ -14,7 +16,7 @@ export const useMyMatches = (sport: string) => {
     ["matches_by_ids", matchesIds],
     fetcherMatchesByIds(sport, matchesIds),
     {
-      enabled: !!sport && !!matchesIds.length && !!matchesLen,
+      enabled: !!sport && !!myMatchesLen && !!matchesLen,
     }
   )
 
@@ -129,12 +131,14 @@ export const useMyMatches = (sport: string) => {
     if (!matchesLen) return
     ;(async () => {
       const myMatches = await getMatchesByUser()
+      setMyMatchesLen(myMatches?.length || 0)
       if (!myMatches || !myMatches.length) return
 
       const myMatchesIds = myMatches.map((id) => id.toNumber()).reverse()
       const myMatchesIdsSet = new Set(myMatchesIds)
 
       if (page > Math.ceil(myMatchesIdsSet.size / 10)) {
+        setIsLastPage(true)
         return
       }
 
@@ -142,7 +146,6 @@ export const useMyMatches = (sport: string) => {
         (page - 1) * 10,
         Math.min(10, myMatchesIdsSet.size) * page
       )
-
       setMatchesIds(ids)
     })()
   }, [contractState, matchesLen, page])
@@ -163,8 +166,14 @@ export const useMyMatches = (sport: string) => {
   }, [contractState])
 
   return {
-    isLoading,
+    myMatchesLen,
+    matchesLen,
+    isLoading:
+      !!sport && !!myMatchesLen && !!matchesLen
+        ? isLoading
+        : !!myMatchesLen && !!matchesLen,
     matches,
+    isLastPage,
     fetchNextPage,
   }
 }

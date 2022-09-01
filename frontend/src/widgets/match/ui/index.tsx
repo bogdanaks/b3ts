@@ -1,30 +1,32 @@
 import React, { useState } from "react"
-import moment from "moment"
 
 import styles from "./styles.module.scss"
 import { IoArrowDown } from "react-icons/io5"
-import classNames from "classnames"
-import { BetsList } from "entities/bet/ui/bets-list"
-import { AddBet } from "features/add-bet/ui"
+import cn from "classnames"
+import { BetsList } from "entities/bet"
+import { BetsOpen, BetsCreate } from "features/bets"
 import { Card } from "shared/ui/card"
 import { useBets } from "entities/bet/model"
+import { MatchTitle } from "entities/match/ui/title"
+import { MatchDate } from "entities/match/ui/date"
+import { BetsWithdraw } from "features/bets/withdraw"
 
 interface MatchItemProps {
   match: Match
 }
 
-export const MatchItem = ({ match }: MatchItemProps) => {
-  const [isOpen, setIsOpen] = useState(false)
+export const MatchCard = ({ match }: MatchItemProps) => {
+  const [isOpenCard, setIsOpenCard] = useState(false)
   const [isOpenBets, setIsOpenBets] = useState(false)
   const { bets } = useBets(match.sc_id, isOpenBets)
 
   const handleArrowClick = () => {
-    if (isOpen) {
+    if (isOpenCard) {
       setIsOpenBets(false)
-      setIsOpen(false)
+      setIsOpenCard(false)
       return
     }
-    setIsOpen(true)
+    setIsOpenCard(true)
   }
 
   return (
@@ -32,32 +34,31 @@ export const MatchItem = ({ match }: MatchItemProps) => {
       <div className={styles.itemWrapper}>
         <div className={styles.itemContent}>
           <div
-            className={classNames(styles.itemInfo, { [styles.isOpen]: isOpen })}
+            className={cn(styles.itemInfo, {
+              [styles.isOpen]: isOpenCard,
+            })}
           >
-            <span className={styles.itemInfoTitle}>
-              {match.sc_id} - {match.title}
-            </span>
-            <span className={styles.itemInfoDate}>
-              {moment(match.start_at).format("DD/MM/YYYY hh:mm")}
-            </span>
-            <button
-              onClick={() => setIsOpenBets(!isOpenBets)}
-              className={classNames(styles.itemInfoLink, {
-                [styles.isOpen]: isOpen,
-              })}
-            >
-              {!isOpenBets ? "Show bets" : "Hide bets"}
-            </button>
+            <MatchTitle title={`${match.sc_id} - ${match.title}`} />
+            <MatchDate date={match.start_at} />
+            {isOpenCard && (
+              <div className={styles.itemBtns}>
+                <BetsOpen
+                  isOpen={isOpenBets}
+                  onClick={() => setIsOpenBets(!isOpenBets)}
+                />
+                <BetsWithdraw onClick={() => console.log("withdraw")} />
+              </div>
+            )}
           </div>
           {Object.entries(match.markets).map(
             ([key, marketsVariants], indexRow) => (
               <ul className={styles.itemMarkets} key={indexRow}>
                 {marketsVariants.map((market, index) => (
-                  <AddBet
+                  <BetsCreate
                     key={`${key}_${index}`}
                     match={match}
                     market={market}
-                    isOpen={isOpen}
+                    isOpen={isOpenCard}
                   />
                 ))}
               </ul>
@@ -66,8 +67,8 @@ export const MatchItem = ({ match }: MatchItemProps) => {
         </div>
         <div
           onClick={handleArrowClick}
-          className={classNames(styles.itemArrow, {
-            [styles.isOpen]: isOpen,
+          className={cn(styles.itemArrow, {
+            [styles.isOpen]: isOpenCard,
           })}
         >
           <IoArrowDown fontSize={20} />

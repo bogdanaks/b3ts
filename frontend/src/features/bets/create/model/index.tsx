@@ -9,7 +9,7 @@ export const useAddBet = (match: Match, isOpen: boolean) => {
   const { toggle, setToggle } = useToggle()
   const [selectedMarket, setSelectedMarket] = useState("")
   const { addBet } = useMyContract()
-  const { total, bets, totalByMarket } = useBets(match.sc_id, isOpen)
+  const { totalAmount, bets, totalByMarket } = useBets(match.sc_id, isOpen)
   const [amount, setAmount] = useState("0")
   const [bidState, setBidState] = useState<
     "IDLE" | "PROCESSING" | "SUCCESS" | "REJECTED" | "PENDING"
@@ -27,10 +27,10 @@ export const useAddBet = (match: Match, isOpen: boolean) => {
     let anotherTotal = new Big(0)
     Object.entries(totalByMarket).forEach(([market, data]) => {
       if (selectedMarket === market) {
-        myTotal = data.amount
+        myTotal = data.totalAmount
         return
       }
-      anotherTotal = anotherTotal.plus(data.amount)
+      anotherTotal = anotherTotal.plus(data.totalAmount)
     })
 
     if (myTotal.eq(0)) return anotherTotal.plus(amount)
@@ -85,7 +85,7 @@ export const useAddBet = (match: Match, isOpen: boolean) => {
     setToggle,
     setBidState,
     potentialWon,
-    total,
+    totalAmount,
     toggle,
     selectedMarket,
     amount,

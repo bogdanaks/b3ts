@@ -11,7 +11,7 @@ type Match = {
   }
   status: MatchStatus
   sport_id: string
-  start_at: Date | null
+  start_at: Date
   finish_at: Date | null
   created_at: Date
   updated_at: Date

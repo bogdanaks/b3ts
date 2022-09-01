@@ -1,0 +1,9 @@
+.button {
+  display: flex;
+  margin-top: auto;
+  width: fit-content;
+  color: $bgColor;
+  background-color: $primary;
+  border-radius: 1rem;
+  padding: 0.3rem 0.7rem;
+}

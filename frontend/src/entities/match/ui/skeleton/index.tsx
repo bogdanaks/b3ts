@@ -3,11 +3,11 @@ import { Card } from "shared/ui/card"
 
 import styles from "./styles.module.scss"
 
-interface SkeletonMatchProps {
+interface MatchSkeletonProps {
   count?: number
 }
 
-export const SkeletonMatch = ({ count = 1 }: SkeletonMatchProps) => {
+export const MatchSkeleton = ({ count = 1 }: MatchSkeletonProps) => {
   return (
     <>
       {[...Array(count).keys()].map((item) => (

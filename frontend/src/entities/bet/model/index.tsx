@@ -2,15 +2,23 @@ import { Bets } from "app/Bets"
 import Big from "big.js"
 import React, { useEffect, useMemo, useState } from "react"
 import { useMyContract } from "shared/hooks/use-my-contract"
+import { useAccount } from "wagmi"
 
 export const useBets = (matchId: number, isOpen: boolean) => {
   const { getBetsByMatchId } = useMyContract()
   const [bets, setBets] = useState<Bets.BetStructOutput[]>([])
+  const { address } = useAccount()
 
   const formattingBets = (bets: Bets.BetStructOutput[]) => {
     const sortByMarkets: { [market: string]: Bets.BetStructOutput[] } = {}
     const resByTotalMarkets: {
-      [market: string]: { count: number; amount: Big; percent: number }
+      [market: string]: {
+        totalCount: number
+        myCount: number
+        totalAmount: Big
+        myAmount: Big
+        percent: number
+      }
     } = {}
 
     bets.forEach((bet) => {
@@ -22,33 +30,47 @@ export const useBets = (matchId: number, isOpen: boolean) => {
     })
 
     let totalAmount = new Big(0)
+    let myTotalAmount = new Big(0)
     Object.entries(sortByMarkets).forEach(([market, bets]) => {
       let total = new Big(0)
-      let count = 0
+      let myTotal = new Big(0)
+      let totalCount = 0
+      let myCount = 0
       bets.forEach((bet) => {
         total = total.plus(new Big(bet.amount.toString()))
-        count++
+        if (bet.user === address) {
+          myTotal = myTotal.plus(new Big(bet.amount.toString()))
+          myCount++
+        }
+        totalCount++
       })
       totalAmount = totalAmount.plus(total)
+      myTotalAmount = myTotalAmount.plus(myTotal)
       resByTotalMarkets[market] = {
-        amount: total.div(10 ** 18),
-        count,
+        totalAmount: total.div(10 ** 18),
+        myAmount: myTotal.div(10 ** 18),
+        totalCount,
+        myCount,
         percent: 0,
       }
     })
 
-    Object.entries(resByTotalMarkets).forEach(([market, data]) => {
+    Object.entries(resByTotalMarkets).forEach(([_, data]) => {
       const perc = new Big(100).mul(
-        data.amount.div(totalAmount.div(10 ** 18).toNumber())
+        data.totalAmount.div(totalAmount.div(10 ** 18).toNumber())
       )
       data["percent"] = Number(perc.toFixed(2))
     })
 
-    return { total: totalAmount, totalByMarket: resByTotalMarkets }
+    console.log("totalAmount", totalAmount.toString())
+    console.log("myTotalAmount", myTotalAmount.toString())
+
+    return { totalAmount, totalByMarket: resByTotalMarkets }
   }
 
-  const { total, totalByMarket } = useMemo(() => {
-    if (!bets.length) return { total: new Big(0), totalByMarket: undefined }
+  const { totalAmount, totalByMarket } = useMemo(() => {
+    if (!bets.length)
+      return { totalAmount: new Big(0), totalByMarket: undefined }
     return formattingBets(bets)
   }, [bets])
 
@@ -63,7 +85,7 @@ export const useBets = (matchId: number, isOpen: boolean) => {
   }, [matchId, isOpen])
 
   return {
-    total,
+    totalAmount,
     totalByMarket,
     bets,
   }

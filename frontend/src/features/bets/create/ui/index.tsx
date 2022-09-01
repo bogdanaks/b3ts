@@ -1,4 +1,3 @@
-import { BetInfo } from "entities/bet/ui/bet-info"
 import React, { useState } from "react"
 
 import { Modal } from "shared/ui/modal"
@@ -12,7 +11,7 @@ import { AddBetStateSuccess } from "./states/success"
 
 import styles from "./styles.module.scss"
 
-export const AddBet = ({
+export const BetsCreate = ({
   match,
   market,
   isOpen,
@@ -58,14 +57,35 @@ export const AddBet = ({
           <span>{market}</span>
         </h4>
         {isOpen && data && (
-          <BetInfo
-            symbol={data.symbol}
-            amount={
-              totalByMarket ? totalByMarket[market]?.amount.toString() : "0"
-            }
-            count={totalByMarket ? totalByMarket[market]?.count : 0}
-            percent={totalByMarket ? totalByMarket[market]?.percent || 0 : 0}
-          />
+          <div className={styles.betInfo}>
+            <span>
+              <span className={styles.gray}>Pct. </span>
+              {totalByMarket ? totalByMarket[market]?.percent || 0 : 0}%
+            </span>
+            <span>
+              <span className={styles.gray}>Total bets</span>{" "}
+              {totalByMarket ? totalByMarket[market]?.totalCount || 0 : 0}
+            </span>
+            <span>
+              <span className={styles.gray}>Total amount</span>{" "}
+              {totalByMarket
+                ? totalByMarket[market]?.totalAmount.toString() || 0
+                : 0}{" "}
+              {data.symbol}
+            </span>
+            <div className={styles.hr} />
+            <span>
+              <span className={styles.gray}>My bets</span>{" "}
+              {totalByMarket ? totalByMarket[market]?.myCount || 0 : 0}
+            </span>
+            <span>
+              <span className={styles.gray}>My amount</span>{" "}
+              {totalByMarket
+                ? totalByMarket[market]?.myAmount.toString() || 0
+                : 0}{" "}
+              {data.symbol}
+            </span>
+          </div>
         )}
       </li>
       <Modal isShow={toggle} style={{ padding: 0 }} onHide={handleHide}>

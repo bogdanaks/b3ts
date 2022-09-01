@@ -13,7 +13,7 @@ export const useMatches = (sport: string) => {
   const [matchesIds, setMatchesIds] = useState<number[]>([])
   const [matches, setMatches] = useState<Match[]>([])
 
-  const { isLoading, data, isSuccess } = useQuery(
+  const { isLoading, data } = useQuery(
     ["matches_by_ids", matchesIds],
     fetcherMatchesByIds(sport, matchesIds),
     {
@@ -130,10 +130,12 @@ export const useMatches = (sport: string) => {
   useEffect(() => {
     if (!matchesLen) return
     if (isLastPage) return
+
     const ids = generateArrayNumbersFromTo(
       matchesLen - 10 * page,
       matchesLen - 10 * page + 10
     ).filter((i) => i > 0)
+
     setMatchesIds(ids)
     if (ids[0] === 1) {
       setIsLastPage(true)
@@ -157,7 +159,7 @@ export const useMatches = (sport: string) => {
   return {
     isLoading,
     isLastPage,
-    matches: data || mockMatches,
+    matches,
     fetchNextPage,
   }
 }

@@ -1,11 +1,10 @@
-import { InfiniteData } from "@tanstack/react-query";
-
-const matches = [
+export const mockMatches = [
   {
     id: 1,
+    sc_id: 1,
     title: "Test1 vs Test2",
     markets: {
-      "TEAM": ["TEAM_1", "TEAM_2"],
+      TEAM: ["TEAM_1", "TEAM_2"],
     },
     status: "CREATED",
     sport_id: "3",
@@ -19,13 +18,14 @@ const matches = [
       title: "Football",
       created_at: new Date(),
       updated_at: new Date(),
-    }
+    },
   },
   {
     id: 2,
+    sc_id: 2,
     title: "Test3 vs Test3",
     markets: {
-      "TEAM": ["TEAM_1", "TEAM_2"],
+      TEAM: ["TEAM_1", "TEAM_2"],
     },
     status: "CREATED",
     sport_id: "3",
@@ -39,18 +39,6 @@ const matches = [
       title: "Football",
       created_at: new Date(),
       updated_at: new Date(),
-    }
-  }
+    },
+  },
 ] as Match[]
-
-export const mockMatches = {
-  pages: [
-    { data: matches },
-  ],
-  nextPage: 1,
-  isLastPage: true,
-} as unknown as InfiniteData<{
-  data: Match[];
-  nextPage: number;
-  isLastPage: boolean;
-}>
