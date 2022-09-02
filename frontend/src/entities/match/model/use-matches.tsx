@@ -159,7 +159,7 @@ export const useMatches = (sport: string) => {
   return {
     isLoading,
     isLastPage,
-    matches,
+    matches: matches.length ? matches : mockMatches,
     fetchNextPage,
   }
 }

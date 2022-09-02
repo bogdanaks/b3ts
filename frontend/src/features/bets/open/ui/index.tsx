@@ -12,9 +12,7 @@ export const BetsOpen = ({ isOpen, onClick }: BetsOpenProps) => {
   return (
     <button
       onClick={onClick}
-      className={cn(styles.button, {
-        [styles.isOpen]: isOpen,
-      })}
+      className={styles.button}
     >
       {!isOpen ? "Show bets" : "Hide bets"}
     </button>

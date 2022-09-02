@@ -2,6 +2,7 @@ import { Bets } from "app/Bets"
 import Big from "big.js"
 import React, { useEffect, useMemo, useState } from "react"
 import { useMyContract } from "shared/hooks/use-my-contract"
+import { betsMock, totalByMarketMock } from "shared/mock"
 import { useAccount } from "wagmi"
 
 export const useBets = (matchId: number, isOpen: boolean) => {
@@ -62,9 +63,6 @@ export const useBets = (matchId: number, isOpen: boolean) => {
       data["percent"] = Number(perc.toFixed(2))
     })
 
-    console.log("totalAmount", totalAmount.toString())
-    console.log("myTotalAmount", myTotalAmount.toString())
-
     return { totalAmount, totalByMarket: resByTotalMarkets }
   }
 
@@ -87,6 +85,6 @@ export const useBets = (matchId: number, isOpen: boolean) => {
   return {
     totalAmount,
     totalByMarket,
-    bets,
+    bets: bets.length ? bets : betsMock,
   }
 }

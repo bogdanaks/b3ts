@@ -50,13 +50,16 @@ export const BetsCreate = ({
     setIsLoadBets(false)
   }
 
+  console.log("totalByMarket", totalByMarket)
+  
+
   return (
     <>
       <li className={styles.item} onClick={handleMarket}>
         <h4 className={styles.itemTitle}>
           <span>{market}</span>
         </h4>
-        {isOpen && data && (
+        {isOpen && (
           <div className={styles.betInfo}>
             <span>
               <span className={styles.gray}>Pct. </span>
@@ -71,7 +74,7 @@ export const BetsCreate = ({
               {totalByMarket
                 ? totalByMarket[market]?.totalAmount.toString() || 0
                 : 0}{" "}
-              {data.symbol}
+              {data?.symbol || "ETH"}
             </span>
             <div className={styles.hr} />
             <span>
@@ -83,7 +86,7 @@ export const BetsCreate = ({
               {totalByMarket
                 ? totalByMarket[market]?.myAmount.toString() || 0
                 : 0}{" "}
-              {data.symbol}
+              {data?.symbol || "ETH"}
             </span>
           </div>
         )}
